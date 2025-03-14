@@ -3,6 +3,12 @@ packages:
   - packages/*
   - tooling/*
 
+#catalog is for managing dependencies that are shared across packages
+#which needs to have the same version across all packages
+
+#note that catalog only servers as a guide, it does not enforce any rules
+#when installing dependencies, pnpm will follow the package.json of each workspace
+
 catalog:
   # Auth
   "@auth/core": 0.37.2

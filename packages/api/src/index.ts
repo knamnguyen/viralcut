@@ -14,6 +14,17 @@ import { createCallerFactory, createTRPCContext } from "./trpc";
 const createCaller = createCallerFactory(appRouter);
 
 /**
+ * Helper to create a server-side caller with the required context
+ * This is useful for server-side operations where you need to call tRPC procedures
+ */
+export const createServerClient = async () => {
+  const ctx = await createTRPCContext({
+    headers: new Headers(),
+  });
+  return appRouter.createCaller(ctx);
+};
+
+/**
  * Inference helpers for input types
  * @example
  * type PostByIdInput = RouterInputs['post']['byId']
