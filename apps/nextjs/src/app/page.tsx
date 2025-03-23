@@ -1,12 +1,13 @@
 import { Suspense } from "react";
 
 import { HydrateClient, prefetch, trpc } from "~/trpc/server";
-import { AuthShowcase } from "./_components/auth-showcase";
+import { AuthShowcase } from "../_components/auth-showcase";
 import {
   CreatePostForm,
   PostCardSkeleton,
   PostList,
-} from "./_components/posts";
+} from "../_components/posts";
+import { SubscriptionStatus } from "../_components/subscription-status";
 
 export default function HomePage() {
   prefetch(trpc.post.all.queryOptions());
@@ -19,6 +20,9 @@ export default function HomePage() {
             Create <span className="text-primary">T3</span> Turbo
           </h1>
           <AuthShowcase />
+
+          {/* Subscription status indicator */}
+          <SubscriptionStatus />
 
           <CreatePostForm />
           <div className="w-full max-w-2xl overflow-y-scroll">

@@ -16,6 +16,7 @@
   "dependencies": {
     "@acme/api": "workspace:*",
     "@acme/db": "workspace:*",
+    "@acme/stripe": "workspace:*",
     "@acme/ui": "workspace:*",
     "@acme/validators": "workspace:*",
     "@clerk/nextjs": "^6.12.5",

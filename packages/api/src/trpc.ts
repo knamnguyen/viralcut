@@ -12,7 +12,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
-import { db } from "@acme/db/client";
+import { db } from "@acme/db";
 
 /**
  * 1. CONTEXT

@@ -16,7 +16,7 @@ export function AuthShowcase() {
           <p className="text-center text-2xl">
             <span>Logged in</span>
           </p>
-          <UserButton afterSignOutUrl="/" />
+          <UserButton />
         </div>
       </SignedIn>
 

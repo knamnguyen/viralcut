@@ -91,7 +91,7 @@ export function CreatePostForm() {
 export function PostList() {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.post.all.queryOptions());
-  const posts = data as RouterOutputs["post"]["all"];
+  const posts = data;
 
   if (posts.length === 0) {
     return (

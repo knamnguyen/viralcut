@@ -15,6 +15,9 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+
+//note that post current does not connect to a user
+//you would want to connect it to a user later
 model Post {
   id        String   @id @default(uuid())
   title     String   @db.VarChar(256)
@@ -23,36 +26,22 @@ model Post {
   updatedAt DateTime @updatedAt
 }
 
-model User {
-  id            String    @id @default(uuid())
-  name          String?   @db.VarChar(255)
-  email         String    @db.VarChar(255)
-  emailVerified DateTime?
-  image         String?   @db.VarChar(255)
-  accounts      Account[]
-  sessions      Session[]
+
+model StripePayment {
+  id               String   @id @default(cuid())
+  clerkUserId      String   // Clerk user ID
+  amount           Int      // in cents
+  currency         String   @default("usd")
+  status           String
+  stripePaymentId  String   @unique
+  metadata         Json?    // Optional metadata about the purchase
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Index to make querying by user efficient
+  @@index([clerkUserId])
 }
 
-model Account {
-  provider          String
-  providerAccountId String
-  userId            String
-  type              String   @db.VarChar(255)
-  refresh_token     String?  @db.VarChar(255)
-  access_token      String?  @db.Text
-  expires_at        Int?
-  token_type        String?  @db.VarChar(255)
-  scope             String?  @db.VarChar(255)
-  id_token          String?  @db.Text
-  session_state     String?  @db.VarChar(255)
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([provider, providerAccountId])
-}
 
-model Session {
-  sessionToken String   @id @db.VarChar(255)
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
+//User and and Stripe subscribers info is stored in the Clerk User object so it is not defined in this schema here
