@@ -2,7 +2,8 @@
 import { NextResponse } from "next/server";
 import { clerkClient } from "@clerk/nextjs/server";
 
-import { StripeService, WebhookResult } from "@acme/stripe";
+import type { WebhookResult } from "@acme/stripe";
+import { StripeService } from "@acme/stripe";
 
 import { env } from "~/env";
 
@@ -11,8 +12,11 @@ import { env } from "~/env";
  * This receives events from Stripe when subscription status changes
  * It updates Clerk metadata with subscription status
  */
+
+console.log("Stripe webhook route loaded");
 export async function POST(req: Request) {
   try {
+    console.log("Stripe webhook received");
     // Create Stripe service
     const stripeService = new StripeService({
       secretKey: env.STRIPE_SECRET_KEY || "",
@@ -29,11 +33,15 @@ export async function POST(req: Request) {
       return new NextResponse("Missing stripe signature", { status: 400 });
     }
 
+    console.log("Stripe signature:", signature);
+
     // Process the webhook event sent from Stripe
-    const result = (await stripeService.handleWebhookEvent(
+    const result = await stripeService.handleWebhookEvent(
       signature,
       Buffer.from(body),
-    )) as WebhookResult;
+    );
+
+    console.log("Stripe result:", result);
 
     // If we have a user ID and it's a subscription or charge event, update Clerk metadata
     if (
@@ -46,13 +54,16 @@ export async function POST(req: Request) {
       const status = await stripeService.hasAccess(result.clerkUserId);
 
       // Update Clerk user metadata
-      await clerkClient.users.updateUser(result.clerkUserId, {
+      const client = await clerkClient();
+      await client.users.updateUser(result.clerkUserId, {
         publicMetadata: {
           hasAccess: status.hasAccess,
           isLifetime: status.isLifetime,
         },
       });
     }
+
+    console.log("Stripe webhook processed");
 
     return NextResponse.json(result);
   } catch (error) {

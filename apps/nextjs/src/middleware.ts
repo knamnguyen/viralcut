@@ -6,6 +6,7 @@ const isPublicRoute = createRouteMatcher([
   "/api/trpc/post.all",
   "/sign-in(.*)",
   "/sign-up(.*)",
+  "/api/webhooks/stripe", // Allow Stripe webhooks
   // Add more public routes as needed
 ]);
 

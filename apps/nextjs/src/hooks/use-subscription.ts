@@ -1,6 +1,8 @@
 // apps/nextjs/src/hooks/use-subscription.ts
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+
 import { useTRPC } from "~/trpc/react";
 
 /**
@@ -8,15 +10,16 @@ import { useTRPC } from "~/trpc/react";
  * Uses tRPC with React Query for caching
  */
 export function useSubscription() {
-  // Query with caching
-  const { data, isLoading, error } = useTRPC().stripe.checkAccess.useQuery(
-    undefined,
-    {
+  const trpc = useTRPC();
+
+  // Query with caching using standard useQuery + queryOptions
+  const { data, isLoading, error } = useQuery(
+    trpc.stripe.checkAccess.queryOptions(undefined, {
       // Cache for 5 minutes, stale after 1 minute
       // This reduces Stripe trpc calls while keeping data relatively fresh
       staleTime: 60 * 1000,
-      cacheTime: 5 * 60 * 1000,
-    },
+      gcTime: 5 * 60 * 1000,
+    }),
   );
 
   return {

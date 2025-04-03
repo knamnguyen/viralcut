@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 import { useTRPC } from "~/trpc/react"; // Correct TRPC import
 
@@ -26,8 +27,9 @@ export function SubscribeButton({
   const trpc = useTRPC();
 
   // tRPC mutation for creating checkout
-  const { mutateAsync: createCheckout } =
-    trpc.stripe.createCheckout.useMutation();
+  const { mutateAsync: createCheckout } = useMutation(
+    trpc.stripe.createCheckout.mutationOptions({}),
+  );
 
   const handleClick = async () => {
     setIsLoading(true);

@@ -3,8 +3,8 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import type { ExportableStripePayment, Prisma } from "@acme/db";
 import { StripePaymentSchema } from "@acme/db";
-import { StripePayment } from "@acme/db/";
 import { StripeService } from "@acme/stripe";
 
 import { protectedProcedure } from "../trpc";
@@ -100,7 +100,7 @@ export const stripeRouter = {
    */
   recordPayment: protectedProcedure
     .input(StripePaymentSchema)
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input }): Promise<ExportableStripePayment> => {
       if (!ctx.user) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
@@ -108,12 +108,9 @@ export const stripeRouter = {
         });
       }
 
-      // // Store the payment in the database
-      // return ctx.db.stripePayment.create({
-      //   data: input,
-      // });
-
-      type DataToInsert = typeof input;
+      type DataToInsert = Omit<typeof input, "metadata"> & {
+        metadata?: Prisma.InputJsonValue;
+      };
 
       const dataToInsert: DataToInsert = {
         clerkUserId: ctx.user.id,
@@ -121,13 +118,14 @@ export const stripeRouter = {
         currency: input.currency,
         status: input.status,
         stripePaymentId: input.stripePaymentId,
-        metadata: input.metadata,
+        metadata: input.metadata as Prisma.InputJsonValue | undefined,
       };
 
       // Store the payment in the database
-      return ctx.db.stripePayment.create({
+      const result = await ctx.db.stripePayment.create({
         data: dataToInsert,
       });
+      return result as ExportableStripePayment;
     }),
 } satisfies TRPCRouterRecord;
 
