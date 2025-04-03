@@ -12,6 +12,7 @@
     "clean:workspaces": "turbo run clean",
     "db:push": "turbo -F @acme/db push",
     "db:studio": "turbo -F @acme/db studio",
+    "db:generate": "turbo -F @acme/db generate",
     "dev": "turbo watch dev --continue",
     "dev:next": "turbo watch dev -F @acme/nextjs...",
     "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",
@@ -19,7 +20,7 @@
     "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",
     "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location .cache/.eslintcache",
     "lint:ws": "pnpm dlx sherif@latest",
-    "postinstall": "pnpm lint:ws",
+    "postinstall": "pnpm lint:ws db:generate",
     "typecheck": "turbo run typecheck",
     "ui-add": "turbo run ui-add"
   },
