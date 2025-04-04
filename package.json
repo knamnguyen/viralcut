@@ -12,7 +12,7 @@
     "clean:workspaces": "turbo run clean",
     "db:push": "turbo -F @acme/db push",
     "db:studio": "turbo -F @acme/db studio",
-    "db:generate": "turbo -F @acme/db generate",
+    "db:generate": "turbo run generate -F @acme/db",
     "dev": "turbo watch dev --continue",
     "dev:next": "turbo watch dev -F @acme/nextjs...",
     "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",
@@ -20,7 +20,7 @@
     "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",
     "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location .cache/.eslintcache",
     "lint:ws": "pnpm dlx sherif@latest",
-    "postinstall": "pnpm lint:ws && turbo -F @acme/db generate --no-generator && mkdir -p apps/nextjs/.next/server && cp packages/db/generated/client/libquery_engine-rhel-openssl-3.0.x.so.node apps/nextjs/.next/server/",
+    "postinstall": "pnpm lint:ws && pnpm db:generate && mkdir -p apps/nextjs/.next/server && cp packages/db/generated/client/libquery_engine-rhel-openssl-3.0.x.so.node apps/nextjs/.next/server/",
     "typecheck": "turbo run typecheck",
     "ui-add": "turbo run ui-add"
   },
