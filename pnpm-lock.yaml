@@ -137,6 +137,9 @@ importers:
       '@acme/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/typescript
+      '@prisma/nextjs-monorepo-workaround-plugin':
+        specifier: ^6.5.0
+        version: 6.5.0
       '@types/node':
         specifier: ^22.10.10
         version: 22.10.10
@@ -381,7 +384,7 @@ importers:
         version: 7.37.4(eslint@9.19.0(jiti@2.4.2))
       eslint-plugin-react-compiler:
         specifier: beta
-        version: 19.0.0-beta-3229e95-20250315(eslint@9.19.0(jiti@2.4.2))
+        version: 19.0.0-beta-e993439-20250328(eslint@9.19.0(jiti@2.4.2))
       eslint-plugin-react-hooks:
         specifier: ^5.1.0
         version: 5.1.0(eslint@9.19.0(jiti@2.4.2))
@@ -1245,6 +1248,9 @@ packages:
 
   '@prisma/get-platform@6.5.0':
     resolution: {integrity: sha512-xYcvyJwNMg2eDptBYFqFLUCfgi+wZLcj6HDMsj0Qw0irvauG4IKmkbywnqwok0B+k+W+p+jThM2DKTSmoPCkzw==}
+
+  '@prisma/nextjs-monorepo-workaround-plugin@6.5.0':
+    resolution: {integrity: sha512-W//PmOanuqx7+xUvj3529wpC+6ZQLwtv+JEcMR5PVubUmKyaduhOdDvVEvjACo9sN7nAqVBTFDHMBarIeOw6Ig==}
 
   '@radix-ui/number@1.1.0':
     resolution: {integrity: sha512-V3gRzhVNU1ldS5XhAPTom1fOIo4ccrjjJgmE+LI2h/WaFpHmx0MQApT+KZHnx8abG6Avtfcz4WoEciMnpFT3HQ==}
@@ -2612,8 +2618,8 @@ packages:
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9
 
-  eslint-plugin-react-compiler@19.0.0-beta-3229e95-20250315:
-    resolution: {integrity: sha512-cJL+A3P3nIBAugbZ/RroaixQ6ygnKYMVM1sRnAE26dqHZRVRfqT8+PCyGtB2tgLmQWZhv6glQ+PRoiXqLMcRug==}
+  eslint-plugin-react-compiler@19.0.0-beta-e993439-20250328:
+    resolution: {integrity: sha512-7hTFaGMz0YYLtkStJFBHjr2zOZwULxg2qCJ8pNYlaOqq2zL1/+Wg7BiDwrPZQIpAn3YQbBu1SHF509M3qpTyIg==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -4965,6 +4971,8 @@ snapshots:
     dependencies:
       '@prisma/debug': 6.5.0
 
+  '@prisma/nextjs-monorepo-workaround-plugin@6.5.0': {}
+
   '@radix-ui/number@1.1.0': {}
 
   '@radix-ui/primitive@1.1.1': {}
@@ -6572,7 +6580,7 @@ snapshots:
       safe-regex-test: 1.1.0
       string.prototype.includes: 2.0.1
 
-  eslint-plugin-react-compiler@19.0.0-beta-3229e95-20250315(eslint@9.19.0(jiti@2.4.2)):
+  eslint-plugin-react-compiler@19.0.0-beta-e993439-20250328(eslint@9.19.0(jiti@2.4.2)):
     dependencies:
       '@babel/core': 7.26.7
       '@babel/parser': 7.26.7
