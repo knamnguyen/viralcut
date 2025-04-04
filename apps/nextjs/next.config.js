@@ -14,13 +14,13 @@ const config = {
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
 
-  // /** Add Prisma plugin */
-  // webpack: (config, { isServer }) => {
-  //   if (isServer) {
-  //     config.plugins = [...config.plugins, new PrismaPlugin()];
-  //   }
-  //   return config;
-  // },
+  /** Add Prisma plugin */
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.plugins = [...config.plugins, new PrismaPlugin()];
+    }
+    return config;
+  },
 };
 
 export default config;
