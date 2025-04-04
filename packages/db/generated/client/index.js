@@ -163,6 +163,18 @@ const config = {
         "fromEnvVar": null,
         "value": "darwin-arm64",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "rhel-openssl-3.0.x"
+      },
+      {
+        "fromEnvVar": null,
+        "value": "linux-arm64-openssl-3.0.x"
+      },
+      {
+        "fromEnvVar": null,
+        "value": "linux-musl-arm64-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
@@ -188,8 +200,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  url       = env(\"POSTGRES_URL\")\n  directUrl = env(\"DIRECT_URL\")\n}\n\n//note that post current does not connect to a user\n//you would want to connect it to a user later\nmodel Post {\n  id        String   @id @default(uuid())\n  title     String   @db.VarChar(256)\n  content   String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel StripePayment {\n  id              String   @id @default(cuid())\n  clerkUserId     String // Clerk user ID\n  amount          Int // in cents\n  currency        String   @default(\"usd\")\n  status          String\n  stripePaymentId String   @unique\n  metadata        Json? // Optional metadata about the purchase\n  createdAt       DateTime @default(now())\n  updatedAt       DateTime @updatedAt\n\n  // Index to make querying by user efficient\n  @@index([clerkUserId])\n}\n\n//User and and Stripe subscribers info is stored in the Clerk User object so it is not defined in this schema here\n",
-  "inlineSchemaHash": "fe2020908da2a41790979833c1656a82d1dac3fc2cda273a0ca2f26fe16d8df5",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\n//binaryTargets to handle the client for production environment on vercel\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../generated/client\"\n  binaryTargets = [\"native\", \"rhel-openssl-3.0.x\", \"linux-arm64-openssl-3.0.x\", \"linux-musl-arm64-openssl-3.0.x\"]\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  url       = env(\"POSTGRES_URL\")\n  directUrl = env(\"DIRECT_URL\")\n}\n\n//note that post current does not connect to a user\n//you would want to connect it to a user later\nmodel Post {\n  id        String   @id @default(uuid())\n  title     String   @db.VarChar(256)\n  content   String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel StripePayment {\n  id              String   @id @default(cuid())\n  clerkUserId     String // Clerk user ID\n  amount          Int // in cents\n  currency        String   @default(\"usd\")\n  status          String\n  stripePaymentId String   @unique\n  metadata        Json? // Optional metadata about the purchase\n  createdAt       DateTime @default(now())\n  updatedAt       DateTime @updatedAt\n\n  // Index to make querying by user efficient\n  @@index([clerkUserId])\n}\n\n//User and and Stripe subscribers info is stored in the Clerk User object so it is not defined in this schema here\n",
+  "inlineSchemaHash": "ca3e1a94ca4c7e35d2eacbad462c851665fa28e331ab18bd2fcbb00d838f725e",
   "copyEngine": true
 }
 
@@ -230,6 +242,18 @@ Object.assign(exports, Prisma)
 // file annotations for bundling tools to include these files
 path.join(__dirname, "libquery_engine-darwin-arm64.dylib.node");
 path.join(process.cwd(), "generated/client/libquery_engine-darwin-arm64.dylib.node")
+
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-rhel-openssl-3.0.x.so.node");
+path.join(process.cwd(), "generated/client/libquery_engine-rhel-openssl-3.0.x.so.node")
+
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-linux-arm64-openssl-3.0.x.so.node");
+path.join(process.cwd(), "generated/client/libquery_engine-linux-arm64-openssl-3.0.x.so.node")
+
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-linux-musl-arm64-openssl-3.0.x.so.node");
+path.join(process.cwd(), "generated/client/libquery_engine-linux-musl-arm64-openssl-3.0.x.so.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
 path.join(process.cwd(), "generated/client/schema.prisma")
