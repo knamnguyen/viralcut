@@ -7,7 +7,7 @@
   },
   "packageManager": "pnpm@9.15.4",
   "scripts": {
-    "build": "pnpm db:generate && turbo run build",
+    "build": "turbo run build",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo run clean",
     "db:push": "turbo -F @acme/db push",
@@ -20,7 +20,7 @@
     "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",
     "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location .cache/.eslintcache",
     "lint:ws": "pnpm dlx sherif@latest",
-    "postinstall": "pnpm lint:ws",
+    "postinstall": "pnpm lint:ws && pnpm db:generate && mkdir -p apps/nextjs/.next/server && cp packages/db/generated/client/libquery_engine-rhel-openssl-3.0.x.so.node apps/nextjs/.next/server/",
     "typecheck": "turbo run typecheck",
     "ui-add": "turbo run ui-add"
   },
