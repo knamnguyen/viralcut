@@ -15,7 +15,7 @@ export interface StripeConfig {
  */
 export interface WebhookResult {
   received: boolean;
-  event?: string;
+  event?: Stripe.Event;
   clerkUserId?: string;
 }
 
@@ -58,7 +58,34 @@ export class StripeService {
     // Get or create a Stripe customer with Clerk ID in metadata
     const customerId = await this.getOrCreateCustomer(clerkUserId, email);
 
-    // Create a checkout session
+    // Prepare additional checkout configuration based on mode
+    let additionalConfig = {};
+
+    // this will add metadata to the subscription webhook event
+    if (options.mode === "subscription") {
+      additionalConfig = {
+        subscription_data: {
+          metadata: {
+            clerkUserId,
+            ...options.metadata,
+          },
+        },
+      };
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    } else if (options.mode === "payment") {
+      // this will add metadata to the charge.succeeded webhook event
+      additionalConfig = {
+        payment_intent_data: {
+          metadata: {
+            clerkUserId,
+            accessType: "lifetime",
+            ...options.metadata,
+          },
+        },
+      };
+    }
+
+    // Create a checkout session with the base config plus mode-specific additions
     const session = await this.stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ["card"],
@@ -75,9 +102,43 @@ export class StripeService {
         clerkUserId, // Include Clerk ID for webhook reference
         ...options.metadata,
       },
+      ...additionalConfig, // Spread in the mode-specific config
     });
 
+    //return url to redirect to stripe checkout
     return { url: session.url };
+  }
+
+  /**
+   * Create a customer portal session for subscription management
+   *
+   * @param clerkUserId - The user's Clerk ID
+   * @param returnUrl - URL to return to after customer is done in the portal
+   * @returns URL to redirect user to Stripe customer portal
+   */
+  async createCustomerPortalSession(
+    clerkUserId: string,
+    returnUrl: string,
+  ): Promise<{ url: string | null }> {
+    try {
+      // Find customer by Clerk ID
+      const customerId = await this.findCustomerByClerkId(clerkUserId);
+
+      if (!customerId) {
+        throw new Error("Customer not found");
+      }
+
+      // Create customer portal session
+      const session = await this.stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: returnUrl,
+      });
+
+      return { url: session.url };
+    } catch (error) {
+      console.error("Error creating customer portal session:", error);
+      return { url: null };
+    }
   }
 
   /**
@@ -85,19 +146,18 @@ export class StripeService {
    * This method directly queries Stripe's API instead of a local database
    *
    * @param clerkUserId - The user's Clerk ID
-   * @returns Whether the user has access
+   * @returns Object with hasAccess boolean and accessType ('lifetime', 'monthly', 'yearly', or null)
    */
-  async hasAccess(clerkUserId: string): Promise<{
+  async checkAccess(clerkUserId: string): Promise<{
     hasAccess: boolean;
-    isLifetime: boolean;
-    subscription?: Stripe.Subscription | null;
+    accessType: "lifetime" | "monthly" | "yearly" | "none";
   }> {
     try {
       // Find customer by Clerk ID
       const customerId = await this.findCustomerByClerkId(clerkUserId);
 
       if (!customerId) {
-        return { hasAccess: false, isLifetime: false };
+        return { hasAccess: false, accessType: "none" };
       }
 
       // Look for active subscriptions
@@ -108,10 +168,18 @@ export class StripeService {
 
       // Check for active subscription
       if (subscriptions.data.length > 0) {
+        const subscription = subscriptions.data[0];
+        // Determine if it's monthly or yearly
+        let accessType: "monthly" | "yearly" = "monthly";
+
+        // Get the first subscription item to check its plan interval
+        if (subscription?.items.data[0]?.plan?.interval === "year") {
+          accessType = "yearly";
+        }
+
         return {
           hasAccess: true,
-          isLifetime: false,
-          subscription: subscriptions.data[0],
+          accessType,
         };
       }
 
@@ -130,21 +198,22 @@ export class StripeService {
 
       return {
         hasAccess: hasLifetimePurchase,
-        isLifetime: hasLifetimePurchase,
+        accessType: hasLifetimePurchase ? "lifetime" : "none",
       };
     } catch (error) {
       console.error("Error checking subscription:", error);
-      return { hasAccess: false, isLifetime: false };
+      return { hasAccess: false, accessType: "none" };
     }
   }
 
   /**
    * Verify and process webhook events from Stripe
-   *
+   * Send back result (extracted context) to webhook handler (for example nextjs route hander) t
    * @param signature - Stripe signature from headers
    * @param payload - Request body as buffer
    * @returns Confirmation of receipt with event type and clerkUserId if available
    */
+  // eslint-disable-next-line @typescript-eslint/require-await
   async handleWebhookEvent(
     signature: string,
     payload: Buffer,
@@ -169,17 +238,26 @@ export class StripeService {
     // Extract clerk user ID from metadata if available
     let clerkUserId: string | undefined = undefined;
 
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object;
-      clerkUserId = session.metadata?.clerkUserId;
-    } else if (event.type.startsWith("customer.subscription.")) {
+    //currently handles charge.succeeded to check for lifetime purchase
+    // and customer.subscription.updated/deleted/created to check for subscription status
+
+    if (event.type === "charge.succeeded") {
+      const charge = event.data.object;
+      console.log("charge.succeeded event");
+      console.log(charge.metadata);
+      clerkUserId = charge.metadata.clerkUserId;
+    }
+
+    if (event.type.startsWith("customer.subscription.")) {
       const subscription = event.data.object as Stripe.Subscription;
+      console.log("customer.subscription event");
+      console.log(subscription.metadata);
       clerkUserId = subscription.metadata.clerkUserId;
     }
 
     return {
       received: true,
-      event: event.type,
+      event: event,
       clerkUserId,
     };
   }
@@ -237,29 +315,5 @@ export class StripeService {
     });
 
     return customer.id;
-  }
-
-  /**
-   * Sync subscription status to Clerk metadata
-   * This is useful if you want to avoid Stripe API calls for basic checks
-   *
-   * @param clerkUserId - The user's Clerk ID
-   * @param updateFn - Function to update Clerk metadata
-   *
-   * needs to add function as input later
-   */
-  async syncSubscriptionToClerk(
-    clerkUserId: string,
-    updateFn: (data: {
-      hasAccess: boolean;
-      isLifetime: boolean;
-    }) => Promise<void>,
-  ): Promise<void> {
-    try {
-      const status = await this.hasAccess(clerkUserId);
-      await updateFn(status);
-    } catch (error) {
-      console.error("Error syncing to Clerk:", error);
-    }
   }
 }

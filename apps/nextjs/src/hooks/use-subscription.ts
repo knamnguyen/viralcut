@@ -14,17 +14,12 @@ export function useSubscription() {
 
   // Query with caching using standard useQuery + queryOptions
   const { data, isLoading, error } = useQuery(
-    trpc.stripe.checkAccess.queryOptions(undefined, {
-      // Cache for 5 minutes, stale after 1 minute
-      // This reduces Stripe trpc calls while keeping data relatively fresh
-      staleTime: 60 * 1000,
-      gcTime: 5 * 60 * 1000,
-    }),
+    trpc.stripe.checkAccess.queryOptions(),
   );
 
   return {
     hasAccess: data?.hasAccess ?? false,
-    isLifetime: data?.isLifetime ?? false,
+    accessType: data?.accessType ?? "none",
     isLoading,
     error,
   };

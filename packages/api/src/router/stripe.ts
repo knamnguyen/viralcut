@@ -78,6 +78,48 @@ export const stripeRouter = {
     }),
 
   /**
+   * Create a customer portal session for subscription management
+   *
+   * @returns URL to redirect to Stripe customer portal
+   */
+  createCustomerPortal: protectedProcedure
+    .input(
+      z.object({
+        returnUrl: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Get authenticated user from context
+      if (!ctx.user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not authenticated",
+        });
+      }
+
+      const userId = ctx.user.id;
+
+      // Get origin for redirect URL if not provided
+      const origin = process.env.NEXTJS_URL ?? "http://localhost:3000";
+      const returnUrl = input.returnUrl ?? `${origin}/subscription`;
+
+      // Create customer portal session with Stripe
+      const result = await stripeService.createCustomerPortalSession(
+        userId, // Clerk user ID
+        returnUrl,
+      );
+
+      if (!result.url) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create customer portal session",
+        });
+      }
+
+      return result;
+    }),
+
+  /**
    * Check if user has access (subscription or lifetime)
    * This queries Stripe directly rather than a local database
    *
@@ -85,12 +127,10 @@ export const stripeRouter = {
    */
   checkAccess: protectedProcedure.query(async ({ ctx }) => {
     if (!ctx.user) {
-      return { hasAccess: false, isLifetime: false };
+      return { hasAccess: false, accessType: "none" };
     }
 
-    // Query Stripe for access status
-    const access = await stripeService.hasAccess(ctx.user.id);
-
+    const access = await stripeService.checkAccess(ctx.user.id);
     return access;
   }),
 
@@ -122,6 +162,7 @@ export const stripeRouter = {
       };
 
       // Store the payment in the database
+      // This is not happening by the way
       const result = await ctx.db.stripePayment.create({
         data: dataToInsert,
       });

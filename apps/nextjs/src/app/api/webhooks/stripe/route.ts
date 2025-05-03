@@ -6,6 +6,7 @@ import type { WebhookResult } from "@acme/stripe";
 import { StripeService } from "@acme/stripe";
 
 import { env } from "~/env";
+import { metadata } from "../../../layout";
 
 /**
  * Stripe webhook handler
@@ -33,34 +34,31 @@ export async function POST(req: Request) {
       return new NextResponse("Missing stripe signature", { status: 400 });
     }
 
-    console.log("Stripe signature:", signature);
-
     // Process the webhook event sent from Stripe
     const result = await stripeService.handleWebhookEvent(
       signature,
       Buffer.from(body),
     );
 
-    console.log("Stripe result:", result);
-
     // If we have a user ID and it's a subscription or charge event, update Clerk metadata
+    // Stripe userid is currently undefined
+    // separation of concerns for data: don't even need to store stripe userid in clerk lol just query status from stripe directly
     if (
       result.clerkUserId &&
       result.event &&
       (result.event.includes("subscription") ||
         result.event.includes("charge.succeeded"))
     ) {
-      // Get subscription status from Stripe
-      const status = await stripeService.hasAccess(result.clerkUserId);
-
-      // Update Clerk user metadata
-      const client = await clerkClient();
-      await client.users.updateUser(result.clerkUserId, {
-        publicMetadata: {
-          hasAccess: status.hasAccess,
-          isLifetime: status.isLifetime,
-        },
-      });
+      // // Get subscription status from Stripe
+      // const status = await stripeService.hasAccess(result.clerkUserId);
+      // // Update Clerk user metadata
+      // const client = await clerkClient();
+      // await client.users.updateUserMetadata(result.clerkUserId, {
+      //   publicMetadata: {
+      //     hasAccess: status.hasAccess,
+      //     isLifetime: status.isLifetime,
+      //   },
+      // });
     }
 
     console.log("Stripe webhook processed");

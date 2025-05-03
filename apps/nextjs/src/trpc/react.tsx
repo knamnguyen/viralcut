@@ -27,13 +27,34 @@ const getQueryClient = () => {
   }
 };
 
+// Export the context for backward compatibility
 export const { useTRPC, TRPCProvider } = createTRPCContext<AppRouter>();
 
-export function TRPCReactProvider(props: { children: React.ReactNode }) {
-  const queryClient = getQueryClient();
-
-  const [trpcClient] = useState(() =>
-    createTRPCClient<AppRouter>({
+// Create a singleton trpc client that will be used in the global provider
+let _trpcClient: ReturnType<typeof createTRPCClient<AppRouter>> | undefined;
+const getTrpcClient = () => {
+  if (typeof window === "undefined") {
+    return createTRPCClient<AppRouter>({
+      links: [
+        loggerLink({
+          enabled: (op) =>
+            env.NODE_ENV === "development" ||
+            (op.direction === "down" && op.result instanceof Error),
+        }),
+        unstable_httpBatchStreamLink({
+          transformer: SuperJSON,
+          url: getBaseUrl() + "/api/trpc",
+          headers() {
+            const headers = new Headers();
+            headers.set("x-trpc-source", "nextjs-ssr");
+            return headers;
+          },
+        }),
+      ],
+    });
+  } else {
+    // Browser: use singleton pattern
+    return (_trpcClient ??= createTRPCClient<AppRouter>({
       links: [
         loggerLink({
           enabled: (op) =>
@@ -50,8 +71,14 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
           },
         }),
       ],
-    }),
-  );
+    }));
+  }
+};
+
+export function TRPCReactProvider(props: { children: React.ReactNode }) {
+  const queryClient = getQueryClient();
+
+  const [trpcClient] = useState(getTrpcClient);
 
   return (
     <QueryClientProvider client={queryClient}>

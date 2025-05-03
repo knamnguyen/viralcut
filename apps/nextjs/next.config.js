@@ -14,7 +14,7 @@ const config = {
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
 
-  /** Add Prisma plugin */
+  /** Add Prisma plugin to make it works with turbo deployment vercel*/
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.plugins = [...config.plugins, new PrismaPlugin()];

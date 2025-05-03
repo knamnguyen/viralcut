@@ -1,6 +1,7 @@
 ---
-description: T3 Turbo Monorepo Stack Context
-globs: **/*
+description: 
+globs: 
+alwaysApply: true
 ---
 
 # T3 Turbo Stack Architecture Overview

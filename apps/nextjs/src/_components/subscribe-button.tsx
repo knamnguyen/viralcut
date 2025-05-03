@@ -23,24 +23,22 @@ export function SubscribeButton({
   buttonText = mode === "subscription" ? "Subscribe" : "Buy Now",
   className = "py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300",
 }: SubscribeButtonProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const trpc = useTRPC();
 
-  // tRPC mutation for creating checkout
-  const { mutateAsync: createCheckout } = useMutation(
+  // react-query mutation for creating checkout
+  const { mutateAsync: createCheckout, isPending } = useMutation(
     trpc.stripe.createCheckout.mutationOptions({}),
   );
 
   const handleClick = async () => {
-    setIsLoading(true);
+    // setIsLoading(true);
 
     try {
       // Call tRPC to create checkout session
       const { url } = await createCheckout({
         priceId,
         mode,
-        // Optional metadata
-        metadata: mode === "payment" ? { accessType: "lifetime" } : undefined,
       });
 
       // Redirect to Stripe checkout page
@@ -51,13 +49,13 @@ export function SubscribeButton({
       }
     } catch (error) {
       console.error("Checkout error:", error);
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   };
 
   return (
-    <button onClick={handleClick} disabled={isLoading} className={className}>
-      {isLoading ? "Redirecting to checkout..." : buttonText}
+    <button onClick={handleClick} disabled={isPending} className={className}>
+      {isPending ? "Redirecting to checkout..." : buttonText}
     </button>
   );
 }

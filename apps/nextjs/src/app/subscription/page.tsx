@@ -2,6 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 
+import { ManageSubscriptionButton } from "~/_components/manage-subscription-button";
 import { SubscribeButton } from "~/_components/subscribe-button";
 import { useSubscription } from "~/hooks/use-subscription";
 
@@ -10,7 +11,11 @@ import { useSubscription } from "~/hooks/use-subscription";
  */
 export default function SubscriptionPage() {
   const { isSignedIn } = useUser();
-  const { hasAccess, isLifetime, isLoading } = useSubscription();
+  const { hasAccess, accessType, isLoading } = useSubscription();
+
+  // Whether to show the manage subscription button (only for subscription users, not lifetime)
+  const showManageSubscription =
+    hasAccess && (accessType === "monthly" || accessType === "yearly");
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -23,14 +28,17 @@ export default function SubscriptionPage() {
       ) : hasAccess ? (
         <div className="rounded-lg bg-green-100 p-8 text-center">
           <h2 className="mb-4 text-2xl font-bold text-green-800">
-            {isLifetime
-              ? "You have lifetime access!"
-              : "You have an active subscription!"}
+            {`Your ${accessType} access is now active!`}
           </h2>
-          <p className="text-green-700">
+          <p className="mb-4 text-green-700">
             Thank you for supporting our product. You have full access to all
             features.
           </p>
+          {showManageSubscription && (
+            <div className="mt-4">
+              <ManageSubscriptionButton className="rounded-lg bg-blue-600 px-6 py-2 font-bold text-white hover:bg-blue-700" />
+            </div>
+          )}
         </div>
       ) : (
         <div className="grid gap-8 md:grid-cols-3">

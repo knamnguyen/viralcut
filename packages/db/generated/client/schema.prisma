@@ -27,6 +27,7 @@ model Post {
   updatedAt DateTime @updatedAt
 }
 
+//Probably not needed because we can use the clerk user object to store the stripe customer id and access type
 model StripePayment {
   id              String   @id @default(cuid())
   clerkUserId     String // Clerk user ID

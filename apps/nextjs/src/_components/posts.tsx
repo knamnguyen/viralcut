@@ -24,7 +24,7 @@ import { toast } from "@acme/ui/toast";
 import { useTRPC } from "~/trpc/react";
 
 export function CreatePostForm() {
-  const trpc = useTRPC();
+  // const trpc = useTRPC();
   const form = useForm({
     schema: CreatePostSchema,
     defaultValues: {
@@ -32,6 +32,8 @@ export function CreatePostForm() {
       title: "",
     },
   });
+
+  const trpc = useTRPC();
 
   const queryClient = useQueryClient();
   const createPost = useMutation(

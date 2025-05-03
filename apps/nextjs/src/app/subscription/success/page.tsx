@@ -9,7 +9,7 @@ import { useSubscription } from "~/hooks/use-subscription";
  * Page shown after successful checkout
  */
 export default function SubscriptionSuccessPage() {
-  const { hasAccess, isLifetime, isLoading } = useSubscription();
+  const { hasAccess, accessType, isLoading } = useSubscription();
 
   // Force a refetch of subscription status on page load
   useEffect(() => {
@@ -31,9 +31,7 @@ export default function SubscriptionSuccessPage() {
           </p>
         ) : hasAccess ? (
           <p className="mb-8 text-green-700">
-            {isLifetime
-              ? "Your lifetime access is now active!"
-              : "Your subscription is now active!"}
+            {`Your ${accessType} access is now active!`}
           </p>
         ) : (
           <p className="mb-8 text-yellow-600">
