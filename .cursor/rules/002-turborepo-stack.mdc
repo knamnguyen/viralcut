@@ -1,9 +1,3 @@
----
-description: 
-globs: 
-alwaysApply: true
----
-
 # T3 Turbo Stack Architecture Overview
 
 This project is built using the T3 Turbo Stack - a full-stack, typesafe monorepo template leveraging the best technologies in the modern web development ecosystem.
@@ -11,32 +5,38 @@ This project is built using the T3 Turbo Stack - a full-stack, typesafe monorepo
 ## Core Technologies
 
 ### Monorepo Structure
+
 - **Turborepo**: Build system for JavaScript/TypeScript monorepos
 - **pnpm**: Fast, disk space efficient package manager
 - **TypeScript**: Strongly typed JavaScript superset across the entire codebase
 
 ### Frontend (apps/nextjs)
+
 - **Next.js**: React framework using the App Router architecture
 - **Tailwind CSS**: Utility-first CSS framework
 - **shadcn/ui**: Reusable UI components built with Radix UI and Tailwind
 
 ### Backend & Data Layer
+
 - **Supabase**: PostgreSQL database with a rich ecosystem of tools
 - **Prisma**: Type-safe ORM with auto-generated client
-- **tRPC**: End-to-end typesafe API layer connecting frontend and backend
+- **tRPC**: End-to-end typesafe API layer connecting frontend and backend using the latest integration with react-query
 - **Zod**: TypeScript-first schema validation
 
 ### Authentication & Payments
+
 - **Clerk**: Complete user management and authentication solution
 - **Stripe**: Payment processing for subscriptions and one-time payments
 
 ## Code Organization
 
 ### Apps Directory
+
 - `/apps/nextjs`: Main Next.js application with App Router
 - (Future) `/apps/expo`: React Native mobile application
 
 ### Packages Directory
+
 - `/packages/api`: tRPC router definitions and API endpoints
 - `/packages/db`: Prisma schema, client configuration, and migrations
 - `/packages/ui`: Shared UI components using shadcn/ui
@@ -50,6 +50,57 @@ This project is built using the T3 Turbo Stack - a full-stack, typesafe monorepo
 3. **Database Access**: Prisma provides type-safe database access with migrations
 4. **Auth Flow**: Clerk handles authentication with middleware protection
 5. **Component Library**: shadcn/ui components are customized and extended for the application
+
+## tRPC Implementation
+
+### Server-Side
+
+- tRPC routers defined in `packages/api/src/router/`
+- Router procedures defined as `publicProcedure` or `protectedProcedure` (with auth middleware)
+- Context includes database access and user authentication via Clerk
+- Server-side API caller available via `createServerClient()` for internal operations
+
+### Client-Side (Next.js App)
+
+- Client setup in `apps/nextjs/src/trpc/` with integration for both client and server components
+- Uses `createTRPCContext` from `@trpc/tanstack-react-query` for React Query integration
+- Client exposes `useTRPC` hook for accessing tRPC procedures
+- Example usage pattern:
+
+  ```tsx
+  // Client component
+  const trpc = useTRPC();
+
+  // For queries (with all react-query features)
+  const { data, isLoading } = useQuery(
+    trpc.someRouter.someQuery.queryOptions(),
+  );
+
+  // For mutations
+  const { mutateAsync, isPending } = useMutation(
+    trpc.someRouter.someMutation.mutationOptions({
+      onSuccess: () => {
+        // Handle success (e.g., invalidate queries)
+      },
+    }),
+  );
+  ```
+
+### Server Components
+
+- Server components use `prefetch` and `HydrateClient` for data fetching
+- Example server component usage:
+
+  ```tsx
+  // Server component
+  prefetch(trpc.someRouter.someQuery.queryOptions());
+
+  return (
+    <HydrateClient>
+      <ClientComponent />
+    </HydrateClient>
+  );
+  ```
 
 ## Development Guidelines
 
