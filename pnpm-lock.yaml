@@ -431,6 +431,9 @@ importers:
       '@sassy/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/typescript
+      '@types/node':
+        specifier: ^22.10.10
+        version: 22.10.10
       '@types/react':
         specifier: catalog:react19
         version: 19.0.10
