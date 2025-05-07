@@ -104,58 +104,68 @@ export const founderlogRouter = createTRPCRouter({
         });
       }
 
-      return db.$transaction(async (prisma) => {
-        await prisma.user.upsert({
-          where: { id: userId },
-          update: {},
-          create: { id: userId },
-        });
-
-        const createdEntries = [];
-        for (const content of entriesContent) {
-          const tagsToLink = findTagsForContent(content);
-          let tagIdsToConnect: { id: string }[] = [];
-
-          if (tagsToLink.length > 0) {
-            const existingTags = await prisma.founderLogTag.findMany({
-              where: { name: { in: tagsToLink } },
-              select: { id: true, name: true },
-            });
-            const existingTagNames = new Set(existingTags.map((t) => t.name));
-            tagIdsToConnect = existingTags.map((t) => ({ id: t.id }));
-
-            const tagsToCreate = tagsToLink.filter(
-              (t) => !existingTagNames.has(t),
-            );
-            if (tagsToCreate.length > 0) {
-              await prisma.founderLogTag.createMany({
-                data: tagsToCreate.map((name) => ({ name })),
-                skipDuplicates: true,
-              });
-              const allTags = await prisma.founderLogTag.findMany({
-                where: { name: { in: tagsToLink } },
-                select: { id: true },
-              });
-              tagIdsToConnect = allTags.map((t) => ({ id: t.id }));
-            }
-          }
-
-          const newEntry = await prisma.founderLogEntry.create({
-            data: {
-              userId,
-              content,
-              tags: {
-                create: tagIdsToConnect.map((tag) => ({
-                  tag: { connect: { id: tag.id } },
-                })),
-              },
-            },
-            include: { tags: { include: { tag: true } } },
+      return db.$transaction(
+        async (prisma) => {
+          await prisma.user.upsert({
+            where: { id: userId },
+            update: {},
+            create: { id: userId },
           });
-          createdEntries.push(newEntry);
-        }
-        return createdEntries;
-      });
+
+          const createdEntries = [];
+          console.log("reached here: ", entriesContent);
+          for (const content of entriesContent) {
+            const tagsToLink = findTagsForContent(content);
+
+            console.log("tagsToLink: ", tagsToLink);
+            let tagIdsToConnect: { id: string }[] = [];
+
+            if (tagsToLink.length > 0) {
+              const existingTags = await prisma.founderLogTag.findMany({
+                where: { name: { in: tagsToLink } },
+                select: { id: true, name: true },
+              });
+              const existingTagNames = new Set(existingTags.map((t) => t.name));
+              tagIdsToConnect = existingTags.map((t) => ({ id: t.id }));
+
+              const tagsToCreate = tagsToLink.filter(
+                (t) => !existingTagNames.has(t),
+              );
+              if (tagsToCreate.length > 0) {
+                await prisma.founderLogTag.createMany({
+                  data: tagsToCreate.map((name) => ({ name })),
+                  skipDuplicates: true,
+                });
+                const allTags = await prisma.founderLogTag.findMany({
+                  where: { name: { in: tagsToLink } },
+                  select: { id: true },
+                });
+                tagIdsToConnect = allTags.map((t) => ({ id: t.id }));
+              }
+            }
+            console.log("tagIdsToConnect: ", tagIdsToConnect);
+
+            const newEntry = await prisma.founderLogEntry.create({
+              data: {
+                userId,
+                content,
+                tags: {
+                  create: tagIdsToConnect.map((tag) => ({
+                    tag: { connect: { id: tag.id } },
+                  })),
+                },
+              },
+              include: { tags: { include: { tag: true } } },
+            });
+            console.log("newEntry: ", newEntry);
+            createdEntries.push(newEntry);
+          }
+          return createdEntries;
+        },
+        {
+          timeout: 15000, // Increase timeout to 15 seconds
+        },
+      );
     }),
 
   // Add morning/evening reflection
@@ -272,4 +282,44 @@ export const founderlogRouter = createTRPCRouter({
         });
       }
     }),
+
+  // Get all public entries for the public wall
+  getAllPublicEntries: publicProcedure.query(async () => {
+    try {
+      const entries = await db.founderLogEntry.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 50, // Limit to most recent 50 entries
+        include: {
+          tags: { include: { tag: true } },
+        },
+      });
+
+      // For each entry, try to get the username
+      const entriesWithUsernames = await Promise.all(
+        entries.map(async (entry) => {
+          try {
+            const client = await clerkClient();
+            const user = await client.users.getUser(entry.userId);
+            return {
+              ...entry,
+              user: {
+                username: user.username,
+              },
+            };
+          } catch (error) {
+            console.error("Failed to get user info:", error);
+            return entry;
+          }
+        }),
+      );
+
+      return { entries: entriesWithUsernames };
+    } catch (error) {
+      console.error("Failed to fetch public entries:", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to fetch public entries.",
+      });
+    }
+  }),
 });

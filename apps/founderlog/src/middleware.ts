@@ -4,18 +4,22 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 const isPublicRoute = createRouteMatcher([
   // Public profile page (matches /any-username)
   // Needs careful regex or matching to avoid conflicts if other top-level routes exist
-  "/((?!sign-in|sign-up|api).+)",
+  "/((?!sign-in|sign-up|api|dashboard).+)",
   // Sign in/up routes
   "/sign-in(.*)",
   "/sign-up(.*)",
+  // Root page is public
+  "/",
   // tRPC public procedures (adjust specific paths as needed)
   "/api/trpc/founderlog.getPublicTimeline",
   "/api/trpc/founderlog.upvoteEntry",
+  "/api/trpc/founderlog.getAllPublicEntries",
 ]);
 
 // Define routes that should be protected
 const isProtectedRoute = createRouteMatcher([
-  "/", // Protect the root dashboard
+  "/dashboard", // Protect dashboard routes
+  "/dashboard/(.*)", // Protect all nested dashboard routes too
   // Add other protected routes here if necessary
 ]);
 

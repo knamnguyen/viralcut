@@ -13,7 +13,6 @@ alwaysApply: true
 ## Critical Rules
 
 - **Package Manager**: Use `pnpm` for all package management tasks.
-- **Build Tool**: Use `tsup` for building packages. Configure it via `package.json`.
 - **Monorepo Structure**: Place reusable code in packages under `packages/` and applications under `apps/`.
 - **Package Naming**: Name all packages under the `@sassy/` scope (e.g., `@sassy/utils`, `@sassy/ui`).
 - **File/Directory Naming**: Use `kebab-case` for all file and directory names (e.g., `src/lib/utils.ts`, `src/components/user-profile`).

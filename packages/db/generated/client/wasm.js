@@ -137,6 +137,44 @@ exports.Prisma.StripePaymentScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FounderLogTagScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FounderLogEntryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  content: 'content',
+  upvoteCount: 'upvoteCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FounderLogEntryTagScalarFieldEnum = {
+  id: 'id',
+  entryId: 'entryId',
+  tagId: 'tagId',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.FounderLogReflectionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  content: 'content',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -166,7 +204,12 @@ exports.Prisma.NullsOrder = {
 
 exports.Prisma.ModelName = {
   Post: 'Post',
-  StripePayment: 'StripePayment'
+  StripePayment: 'StripePayment',
+  User: 'User',
+  FounderLogTag: 'FounderLogTag',
+  FounderLogEntry: 'FounderLogEntry',
+  FounderLogEntryTag: 'FounderLogEntryTag',
+  FounderLogReflection: 'FounderLogReflection'
 };
 
 /**

@@ -1,8 +1,13 @@
 "use client";
 
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+
 import type { RouterOutputs } from "@sassy/api";
 import { CreatePostSchema } from "@sassy/db";
-import { cn } from "@sassy/ui";
 import { Button } from "@sassy/ui/button";
 import {
   Form,
@@ -13,12 +18,8 @@ import {
   useForm,
 } from "@sassy/ui/form";
 import { Input } from "@sassy/ui/input";
-import { toast } from "@sassy/ui/toast";
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
+import { Toast } from "@sassy/ui/toast";
+import { cn } from "@sassy/ui/utils";
 
 import { useTRPC } from "~/trpc/react";
 
@@ -42,11 +43,11 @@ export function CreatePostForm() {
         await queryClient.invalidateQueries(trpc.post.pathFilter());
       },
       onError: (err) => {
-        toast.error(
-          err.data?.code === "UNAUTHORIZED"
-            ? "You must be logged in to post"
-            : "Failed to create post",
-        );
+        // Toast.error(
+        //   err.data?.code === "UNAUTHORIZED"
+        //     ? "You must be logged in to post"
+        //     : "Failed to create post",
+        // );
       },
     }),
   );
