@@ -151,7 +151,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/knamnguyen/Documents/0-Programming/founderlog/packages/db/generated/client",
+      "value": "/Users/knamnguyen/Documents/0-Programming/turbo-t3-sassy/packages/db/generated/client",
       "fromEnvVar": null
     },
     "config": {
@@ -177,7 +177,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/knamnguyen/Documents/0-Programming/founderlog/packages/db/prisma/schema.prisma",
+    "sourceFilePath": "/Users/knamnguyen/Documents/0-Programming/turbo-t3-sassy/packages/db/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

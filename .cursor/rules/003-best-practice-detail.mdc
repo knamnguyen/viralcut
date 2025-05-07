@@ -18,6 +18,7 @@ Generate code, corrections, and refactorings that comply with the basic principl
   - Avoid using any as it defeats TypeScript's type checking benefits.
   - Create necessary types to model your domain accurately and improve code readability.
   - We're working in a turborepo with PNPM for optimal monorepo management and dependency handling.
+  - When running a script to build something, make sure to check in the existing package.json of the package/app to see if there is already a script for that to run with pnpm (not the package.json at the root)
 - Use JSDoc to document public classes and methods. Include examples to demonstrate proper usage and edge cases.
 - Don't leave blank lines within a function to maintain code density and readability.
 - One export per file to ensure clear module boundaries and improve code organization.
@@ -28,6 +29,14 @@ Generate code, corrections, and refactorings that comply with the basic principl
   - Favor flex and gap instead of margin bumps and space-* for more maintainable layouts.
   - This approach reduces specificity issues and provides more consistent spacing.
   - Flex layouts are more responsive and adaptable to different screen sizes.
+
+
+###Third-party services:
+- When integrating services like Stripe and Clerk, store only foreign IDs in each system (e.g., {stripeCustomerId: "cus_123"} in Clerk, {clerkUserId: "user_456"} in Stripe). 
+- Each service should remain the source of truth for its domain, minimizing synchronization by fetching fresh data (like auth state, email, access status, subscription plan) when needed versus maintaining duplicate state. 
+- Since Clerk is handling userinfo, basic info like username, email, etc should always be queried from Clerk
+- Only local things with custom features should be included in our app's db's User table
+- Focus webhooks on maintaining relationship integrity rather than mirroring complete data structures. This approach creates a resilient system that properly separates concerns.
 
 ### Nomenclature
 
@@ -107,6 +116,7 @@ Generate code, corrections, and refactorings that comply with the basic principl
     3. Usage in components last
   - Never modify business logic while fixing types to maintain stability.
   - Verify type fixes with another type check before proceeding.
+- Do not write tests most of the time. Always ask and confirm users if they want to write test for a new feature
 - Write failing tests first (Red phase) to define expected behavior.
   - One test at a time to maintain focus and simplicity.
   - Verify test failure message clarity for better debugging.
@@ -195,7 +205,8 @@ These functions define how the AI agent interacts with project documentation and
 
 ### Testing Patterns
 
-- Configure bun test coverage consistently across monorepo:
+- Do not write tests most of the time. Always ask and confirm users if they want to write test for a new feature
+- Configure bun test coverage consistently across monorepo.
 - Follow Test-Driven Development (TDD):
   - Write failing tests first
   - Implement minimal passing code

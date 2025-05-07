@@ -1,6 +1,6 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: true
 ---
 
@@ -11,38 +11,32 @@ This project is built using the T3 Turbo Stack - a full-stack, typesafe monorepo
 ## Core Technologies
 
 ### Monorepo Structure
-
 - **Turborepo**: Build system for JavaScript/TypeScript monorepos
 - **pnpm**: Fast, disk space efficient package manager
 - **TypeScript**: Strongly typed JavaScript superset across the entire codebase
 
 ### Frontend (apps/nextjs)
-
 - **Next.js**: React framework using the App Router architecture
 - **Tailwind CSS**: Utility-first CSS framework
 - **shadcn/ui**: Reusable UI components built with Radix UI and Tailwind
 
 ### Backend & Data Layer
-
 - **Supabase**: PostgreSQL database with a rich ecosystem of tools
 - **Prisma**: Type-safe ORM with auto-generated client
-- **tRPC**: End-to-end typesafe API layer connecting frontend and backend using the latest integration with react-query
+- **tRPC**: End-to-end typesafe API layer connecting frontend and backend
 - **Zod**: TypeScript-first schema validation
 
 ### Authentication & Payments
-
 - **Clerk**: Complete user management and authentication solution
 - **Stripe**: Payment processing for subscriptions and one-time payments
 
 ## Code Organization
 
 ### Apps Directory
-
 - `/apps/nextjs`: Main Next.js application with App Router
 - (Future) `/apps/expo`: React Native mobile application
 
 ### Packages Directory
-
 - `/packages/api`: tRPC router definitions and API endpoints
 - `/packages/db`: Prisma schema, client configuration, and migrations
 - `/packages/ui`: Shared UI components using shadcn/ui
