@@ -4,7 +4,10 @@
     "lib": ["ES2022", "dom", "dom.iterable"],
     "jsx": "preserve",
     "rootDir": ".",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["src/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules"]

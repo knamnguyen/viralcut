@@ -49,7 +49,7 @@
     }
   },
   "globalEnv": [
-    "POSTGRES_URL",
+    "DATABASE_URL",
     "DIRECT_URL",
     "CLERK_SECRET_KEY",
     "NEXT_PUBLIC_CLERK_FRONTEND_API",

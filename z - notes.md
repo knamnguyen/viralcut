@@ -18,3 +18,4 @@
 //TODO: to synct to template later:
 packages/db/prisma/schema.prisma
 packages/ui/package.json
+turbo.json
