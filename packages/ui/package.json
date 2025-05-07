@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "exports": {
-    "./utils": "./src/utils.ts",
+    "./utils": "./src/lib/utils.ts",
     "./*": "./src/ui/*.tsx",
     "./components/*": "./src/components/*.tsx",
     "./hooks/*": "./src/hooks/*.tsx",
