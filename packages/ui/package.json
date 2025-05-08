@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "exports": {
-    "./utils": "./src/utils.ts",
     "./*": "./src/ui/*.tsx",
+    "./utils": "./src/utils.ts",
     "./components/*": "./src/components/*.tsx",
     "./hooks/*": "./src/hooks/*.tsx",
     "./theme": "./src/ui/theme.tsx"
@@ -37,7 +37,6 @@
     "@sassy/prettier-config": "workspace:*",
     "@sassy/tailwind-config": "workspace:*",
     "@sassy/tsconfig": "workspace:*",
-    "@types/node": "^22.10.10",
     "@types/react": "catalog:react19",
     "eslint": "catalog:",
     "prettier": "catalog:",

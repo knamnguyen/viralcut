@@ -9,7 +9,6 @@ import type {
 } from "react-hook-form";
 import type { ZodType, ZodTypeDef } from "zod";
 import * as React from "react";
-import { cn } from "@/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Slot } from "radix-ui";
 import {
@@ -18,6 +17,8 @@ import {
   FormProvider,
   useFormContext,
 } from "react-hook-form";
+
+import { cn } from "@sassy/ui/utils";
 
 import { Label } from "./label";
 

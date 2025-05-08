@@ -1,5 +1,6 @@
 import * as React from "react";
-import { cn } from "@/utils";
+
+import { cn } from "@sassy/ui/utils";
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
