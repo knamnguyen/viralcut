@@ -19,3 +19,4 @@
 packages/db/prisma/schema.prisma
 packages/ui/package.json
 turbo.json
+package.json

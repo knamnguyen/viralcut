@@ -3,9 +3,9 @@
   "private": true,
   "engines": {
     "node": ">=22.11.0",
-    "pnpm": "^9.15.4"
+    "pnpm": ">=9.6.0"
   },
-  "packageManager": "pnpm@9.15.4",
+  "packageManager": "pnpm@10.6.3",
   "scripts": {
     "build": "turbo run build",
     "clean": "git clean -xdf node_modules",
@@ -21,6 +21,7 @@
     "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location .cache/.eslintcache",
     "lint:ws:fix": "pnpm dlx sherif@latest -f",
     "lint:ws": "pnpm dlx  sherif@latest",
+    "__cmt1": "//info postinstall script is copying the required engine for prisma into the nextjs app server files",
     "postinstall": "pnpm lint:ws && pnpm db:generate && mkdir -p apps/nextjs/.next/server && cp packages/db/generated/client/libquery_engine-rhel-openssl-3.0.x.so.node apps/nextjs/.next/server/",
     "typecheck": "turbo run typecheck",
     "ui-add": "turbo run ui-add",
