@@ -10,9 +10,10 @@ import type { User } from "@clerk/nextjs/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-import { ZodError } from "zod";
+import { z, ZodError } from "zod";
 
-import { db } from "@sassy/db";
+import { db, Prisma } from "@sassy/db";
+import { StripePaymentSchema } from "@sassy/db/schema-validators";
 
 /**
  * 1. CONTEXT

@@ -3,8 +3,8 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import type { ExportableStripePayment, Prisma } from "@sassy/db";
-import { StripePaymentSchema } from "@sassy/db";
+// import type { Prisma } from "@sassy/db";
+import { StripePaymentSchema } from "@sassy/db/schema-validators";
 import { StripeService } from "@sassy/stripe";
 
 import { protectedProcedure } from "../trpc";
@@ -18,9 +18,6 @@ const stripeService = new StripeService({
   webhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
 });
 
-// Add this annotation to override TypeScript's inference
-// adding explicit type for TRPCRouterRecord here helps prevent type leakage issues
-//satisfies TRPCRouterRecord doesn't work here because of sth, need to check
 //TODO: check if this is the case
 export const stripeRouter = {
   /**
@@ -134,13 +131,9 @@ export const stripeRouter = {
     return access;
   }),
 
-  /**
-   * Record a payment in the database
-   * This is typically called from the Stripe webhook handler
-   */
   recordPayment: protectedProcedure
     .input(StripePaymentSchema)
-    .mutation(async ({ ctx, input }): Promise<ExportableStripePayment> => {
+    .mutation(async ({ ctx, input }) => {
       if (!ctx.user) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
@@ -148,17 +141,13 @@ export const stripeRouter = {
         });
       }
 
-      type DataToInsert = Omit<typeof input, "metadata"> & {
-        metadata?: Prisma.InputJsonValue;
-      };
-
-      const dataToInsert: DataToInsert = {
+      const dataToInsert = {
         clerkUserId: ctx.user.id,
         amount: input.amount,
         currency: input.currency,
         status: input.status,
         stripePaymentId: input.stripePaymentId,
-        metadata: input.metadata as Prisma.InputJsonValue | undefined,
+        metadata: input.metadata,
       };
 
       // Store the payment in the database
@@ -166,7 +155,7 @@ export const stripeRouter = {
       const result = await ctx.db.stripePayment.create({
         data: dataToInsert,
       });
-      return result as ExportableStripePayment;
+      return result;
     }),
 } satisfies TRPCRouterRecord;
 

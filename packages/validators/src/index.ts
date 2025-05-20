@@ -1,28 +1,16 @@
 import { z } from "zod";
 
-export const unused = z.string().describe(
-  `This lib is currently not used as we use drizzle-zod for simple schemas
-   But as your application grows and you need other validators to share
-   with back and frontend, you can put them in here
-  `,
-);
+// Make primitive types more restrictive for early validation
+export const idSchema = z.string().min(1);
+export const stringFieldSchema = z.string().min(1);
+export const contentSchema = z.string().min(1);
+export const urlSchema = z.string().url().optional().nullable();
+export const cuidSchema = z.string().cuid();
 
 export const createEntryInputSchema = z.object({
   content: z.string().min(1, { message: "Entry content cannot be empty." }),
 });
 export type CreateEntryInput = z.infer<typeof createEntryInputSchema>;
-
-export const addReflectionInputSchema = z.object({
-  type: z.enum(["morning", "evening"], {
-    errorMap: () => ({
-      message: "Reflection type must be 'morning' or 'evening'.",
-    }),
-  }),
-  content: z
-    .string()
-    .min(1, { message: "Reflection content cannot be empty." }),
-});
-export type AddReflectionInput = z.infer<typeof addReflectionInputSchema>;
 
 export const upvoteEntryInputSchema = z.object({
   entryId: z.string().cuid({ message: "Invalid entry ID format." }),

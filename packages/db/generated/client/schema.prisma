@@ -45,11 +45,16 @@ model StripePayment {
 
 // User model to link with Clerk users
 model User {
-  id          String                 @id
-  entries     FounderLogEntry[]
-  reflections FounderLogReflection[]
-  createdAt   DateTime               @default(now())
-  updatedAt   DateTime               @updatedAt
+  id                  String                 @id // This is the Clerk ID
+  firstName           String?
+  lastName            String?
+  primaryEmailAddress String?                @unique
+  imageUrl            String?
+  clerkUserProperties Json? // Made optional to preserve existing data
+  entries             FounderLogEntry[]
+  reflections         FounderLogReflection[]
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
 }
 
 // Tags for categorizing founder log entries

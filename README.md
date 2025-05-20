@@ -268,3 +268,78 @@ Deploying your Expo application works slightly differently compared to Next.js o
 The stack originates from [create-t3-app](https://github.com/t3-oss/create-t3-app).
 
 A [blog post](https://jumr.dev/blog/t3-turbo) where I wrote how to migrate a T3 app into this.
+
+# FounderLog
+
+A monorepo for the FounderLog application, built with the T3 Turbo Stack.
+
+## What's inside?
+
+This repository includes the following packages/apps:
+
+### Apps and Packages
+
+- `apps/founderlog`: Main Next.js application
+- `apps/nextjs`: Alternative Next.js application setup
+- `apps/hono-webhook-handler`: Cloudflare Workers service for handling Clerk webhooks
+- `packages/api`: tRPC API definitions shared across applications
+- `packages/db`: Database schema and client using Prisma
+- `packages/ui`: UI components built with Tailwind CSS
+- `packages/validators`: Shared Zod validators for type-safe data validation
+- `packages/stripe`: Stripe integration utilities
+
+Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+
+### Clerk Webhook Integration
+
+The project includes a dedicated webhook handler service for Clerk authentication events. This service:
+
+- Runs as a Cloudflare Worker for global edge deployment
+- Receives user events from Clerk (created, updated, deleted)
+- Syncs user data with your database
+- Uses the same tRPC router as the main application
+
+For setup instructions, see the [webhook handler README](./apps/hono-webhook-handler/README.md).
+
+### Utilities
+
+- [TypeScript](https://www.typescriptlang.org/) for static type checking
+- [ESLint](https://eslint.org/) for code linting
+- [Prettier](https://prettier.io) for code formatting
+
+### Build
+
+To build all apps and packages, run the following command:
+
+```
+pnpm build
+```
+
+### Develop
+
+To develop all apps and packages, run the following command:
+
+```
+pnpm dev
+```
+
+## Deployment
+
+### Next.js app
+
+Deploy the Next.js application to Vercel:
+
+```bash
+pnpm deploy:vercel
+```
+
+### Webhook handler
+
+Deploy the webhook handler to Cloudflare Workers:
+
+```bash
+cd apps/hono-webhook-handler
+pnpm deploy
+```
+
+This deploys the handler to Cloudflare's global edge network, ensuring low-latency webhook processing from anywhere in the world.

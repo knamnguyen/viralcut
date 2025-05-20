@@ -4,81 +4,34 @@ import type { TRPCClientErrorLike } from "@trpc/client";
 import React from "react";
 import Link from "next/link";
 import { useAuth, UserButton, useUser } from "@clerk/nextjs";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type { AppRouter } from "@sassy/api";
 import { Badge } from "@sassy/ui/badge";
 import { Button } from "@sassy/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@sassy/ui/card";
 import { Textarea } from "@sassy/ui/textarea";
-import { Toaster } from "@sassy/ui/toaster";
+import { Toaster } from "@sassy/ui/toast";
 
 import { useTRPC } from "~/trpc/react";
-
-// Reflection input component for morning/evening reflections
-const ReflectionInput = ({ type }: { type: "morning" | "evening" }) => {
-  const trpc = useTRPC();
-  const [content, setContent] = React.useState("");
-
-  const { mutate: addReflection, isPending } = useMutation(
-    trpc.founderlog.addReflection.mutationOptions({
-      onSuccess: () => {
-        setContent("");
-        console.log(`${type} reflection saved`);
-      },
-      onError: (error: TRPCClientErrorLike<AppRouter>) => {
-        console.error("Failed to add reflection:", error);
-      },
-    }),
-  );
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (content.trim()) {
-      addReflection({ type, content });
-    }
-  };
-
-  return (
-    <Card className="mb-4">
-      <CardHeader>
-        <CardTitle>
-          {type === "morning" ? "Morning Intentions" : "Evening Achievements"}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-          <Textarea
-            placeholder={`What are your ${type === "morning" ? "goals for today?" : "accomplishments?"}`}
-            value={content}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-              setContent(e.target.value)
-            }
-            rows={3}
-          />
-          <Button
-            type="submit"
-            disabled={isPending || !content.trim()}
-            className="self-end"
-          >
-            {isPending ? "Saving..." : "Save Reflection"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
-  );
-};
 
 // Entry input component for logging progress
 const EntryInput = () => {
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const [content, setContent] = React.useState("");
+
+  const dashboardQueryOptions = trpc.founderlog.getDashboardData.queryOptions();
 
   const { mutate: createEntry, isPending } = useMutation(
     trpc.founderlog.createEntry.mutationOptions({
-      onSuccess: () => {
+      onSuccess: async () => {
         setContent("");
         console.log("Entry created successfully");
+        //revalidate so that data shows up
+        await queryClient.invalidateQueries({
+          queryKey: dashboardQueryOptions.queryKey,
+        });
       },
       onError: (error: TRPCClientErrorLike<AppRouter>) => {
         console.error("Failed to create entry:", error);
@@ -138,7 +91,7 @@ interface TimelineEntryType {
 
 // Timeline component for displaying entries
 const Timeline = ({ entries }: { entries: readonly TimelineEntryType[] }) => {
-  if (!entries || entries.length === 0) {
+  if (entries.length === 0) {
     return <p>No entries yet. Start logging your progress!</p>;
   }
   return (
@@ -245,15 +198,10 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <div className="mb-6 grid gap-4 md:grid-cols-2">
-        <ReflectionInput type="morning" />
-        <ReflectionInput type="evening" />
-      </div>
-
       <EntryInput />
 
       <h2 className="mb-4 text-xl font-semibold">Your Timeline</h2>
-      {data?.entries?.length ? (
+      {data?.entries.length ? (
         <Timeline entries={data.entries} />
       ) : (
         <p>No entries found.</p>

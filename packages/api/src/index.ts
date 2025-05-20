@@ -10,12 +10,17 @@ import { createCallerFactory, createTRPCContext } from "./trpc";
  * const trpc = createCaller(createContext);
  * const res = await trpc.post.all();
  *       ^? Post[]
+ * This can be used in the trpc procedures themselves (backend logic)
+ * Or in the react server components (frontend logic) to fetch data in a simple manner
+ * You most likely don't need to use this since it is better to reuse repos/functions
+ * instead of recalling other procedures within procedures
  */
 const createCaller = createCallerFactory(appRouter);
 
 /**
  * Helper to create a server-side caller with the required context
  * This is useful for server-side operations where you need to call tRPC procedures
+ * But don't use this inside the trpc procedures themselves because it will create a new context
  */
 export const createServerClient = async () => {
   const ctx = await createTRPCContext({

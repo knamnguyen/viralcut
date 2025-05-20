@@ -9,7 +9,7 @@ import type { AppRouter } from "@sassy/api";
 import { Badge } from "@sassy/ui/badge";
 import { Button } from "@sassy/ui/button";
 import { Card, CardContent } from "@sassy/ui/card";
-import { Toaster } from "@sassy/ui/toaster";
+import { Toaster } from "@sassy/ui/toast";
 
 import { useTRPC } from "~/trpc/react";
 

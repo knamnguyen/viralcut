@@ -1,22 +1,17 @@
-[x] //TODO: swap drizzle out for prisma
-[x] //TODO: setup supabase database template instead of vercel
-[x] //TODO: swap next auth out for clerk
-[x] //TODO: set up strip integrations
-
-[x] //TODO: draft deploy repo on vercel
-[x] //TODO: makes stripe + clerk integrations into popup modals\
-
-[] //TODO: make sure stripe syncs with clerk
-[] //TODO: fix lifetime plan not syncing
-[] //TODO: make sure stripe subscription updates plans syncs with clerk
-[] //TODO: add stripe customer portal via api to have seamless login
-
-[] //TODO: research backend persistent or serverless lambda for processing - aka trpc or express
-[] //TODO: prototype backend api for processing image
-[] //TODO: prototype backend api for processing video
+//TODO: cleaning up and organize types for rep
+[done] figure ways to reuse types from db inside react components and trpc routes
+[] fix prisma types issues not resolve properly in trpc router
+[] resolve auth flow in api being reliant on nextjs hence not working in others
+[] relearn auth flow - currently at the api level but any others?
+[] diff between type off interfence and RouterOutput infer utility
+[] set up persistent working hono js server on aws/cloudfare
+[] sync clerk/stripe webhook to user creation in db
 
 //TODO: to synct to template later:
 packages/db/prisma/schema.prisma
 packages/ui/package.json
 turbo.json
 package.json
+
+//For some schema validators, you might not need to provide everything in the input. For example, for update user, you don't need to provide userId, because it can be provided at the context api layer. But still for others, you kinda do.
+//If you move your logic to repo in api, you wouldn't need to set up separate things but can still reuse that logic in hono, given that hono probably has access to your db

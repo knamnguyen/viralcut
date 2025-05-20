@@ -1,31 +1,19 @@
 {
-  "name": "@sassy/db",
+  "name": "@sassy/clerk",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "__cmt1": "//info using just in time package export so no need to worry about build step shit",
   "exports": {
-    ".": "./src/index.ts",
-    "./*": "./src/*.ts",
-    "./generated/*": "./generated/*"
+    ".": "./src/index.ts"
   },
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "db:generate": "pnpm with-env prisma generate",
-    "db:push": "pnpm with-env prisma db push --skip-generate",
-    "db:migrate": "pnpm with-env prisma migrate dev",
-    "db:studio": "pnpm with-env prisma studio",
-    "dev": "tsc --watch",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
     "with-env": "dotenv -e ../../.env --"
-  },
-  "dependencies": {
-    "@prisma/client": "^6.4.1",
-    "zod": "catalog:"
   },
   "devDependencies": {
     "@sassy/eslint-config": "workspace:*",
@@ -33,10 +21,11 @@
     "@sassy/tsconfig": "workspace:*",
     "dotenv-cli": "^8.0.0",
     "eslint": "catalog:",
-    "prettier": "catalog:",
-    "prisma": "^6.4.1",
     "tsx": "^4.19.3",
     "typescript": "catalog:"
   },
-  "prettier": "@sassy/prettier-config"
+  "prettier": "@sassy/prettier-config",
+  "dependencies": {
+    "@clerk/backend": "^0.38.0"
+  }
 }

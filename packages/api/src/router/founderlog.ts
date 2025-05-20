@@ -1,18 +1,15 @@
-import type { User } from "@clerk/nextjs/server";
+import type { TRPCRouterRecord } from "@trpc/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
 
-import { db, Prisma } from "@sassy/db";
+import { db } from "@sassy/db";
 import {
-  addReflectionInputSchema,
   createEntryInputSchema,
   getPublicTimelineInputSchema,
   upvoteEntryInputSchema,
 } from "@sassy/validators";
 
-import type { TRPCContext } from "../trpc";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { protectedProcedure, publicProcedure } from "../trpc";
 
 // Simple keyword list for MVP auto-tagging (case-insensitive)
 // Can be expanded and moved to a config/constant file later
@@ -84,7 +81,7 @@ const findTagsForContent = (content: string): string[] => {
   return Array.from(foundTags);
 };
 
-export const founderlogRouter = createTRPCRouter({
+export const founderlogRouter = {
   // Create new log entry(s)
   createEntry: protectedProcedure
     .input(createEntryInputSchema)
@@ -113,7 +110,7 @@ export const founderlogRouter = createTRPCRouter({
           });
 
           const createdEntries = [];
-          console.log("reached here: ", entriesContent);
+
           for (const content of entriesContent) {
             const tagsToLink = findTagsForContent(content);
 
@@ -166,32 +163,6 @@ export const founderlogRouter = createTRPCRouter({
           timeout: 15000, // Increase timeout to 15 seconds
         },
       );
-    }),
-
-  // Add morning/evening reflection
-  addReflection: protectedProcedure
-    .input(addReflectionInputSchema)
-    .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
-      const userId = ctx.user.id;
-
-      return db.$transaction(async (prisma) => {
-        await prisma.user.upsert({
-          where: { id: userId },
-          update: {},
-          create: { id: userId },
-        });
-
-        return prisma.founderLogReflection.create({
-          data: {
-            userId,
-            type: input.type,
-            content: input.content,
-          },
-        });
-      });
     }),
 
   // Get data for the user's dashboard
@@ -267,8 +238,8 @@ export const founderlogRouter = createTRPCRouter({
         });
         return updatedEntry;
       } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          if (error.code === "P2025") {
+        if (error) {
+          if (error === "P2025") {
             throw new TRPCError({
               code: "NOT_FOUND",
               message: `Entry with ID '${input.entryId}' not found.`,
@@ -297,23 +268,19 @@ export const founderlogRouter = createTRPCRouter({
       // For each entry, try to get the username
       const entriesWithUsernames = await Promise.all(
         entries.map(async (entry) => {
-          try {
-            const client = await clerkClient();
-            const user = await client.users.getUser(entry.userId);
-            return {
-              ...entry,
-              user: {
-                username: user.username,
-              },
-            };
-          } catch (error) {
-            console.error("Failed to get user info:", error);
-            return entry;
-          }
+          const client = await clerkClient();
+          const user = await client.users.getUser(entry.userId);
+
+          return {
+            ...entry,
+            user: {
+              username: user.username ?? "Unknown User",
+            },
+          };
         }),
       );
 
-      return { entries: entriesWithUsernames };
+      return entriesWithUsernames;
     } catch (error) {
       console.error("Failed to fetch public entries:", error);
       throw new TRPCError({
@@ -322,4 +289,4 @@ export const founderlogRouter = createTRPCRouter({
       });
     }
   }),
-});
+} satisfies TRPCRouterRecord;

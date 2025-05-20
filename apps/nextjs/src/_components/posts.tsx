@@ -24,7 +24,6 @@ import { cn } from "@sassy/ui/utils";
 import { useTRPC } from "~/trpc/react";
 
 export function CreatePostForm() {
-  // const trpc = useTRPC();
   const form = useForm({
     schema: CreatePostSchema,
     defaultValues: {
@@ -32,7 +31,6 @@ export function CreatePostForm() {
       title: "",
     },
   });
-
   const trpc = useTRPC();
 
   const queryClient = useQueryClient();
@@ -123,6 +121,7 @@ export function PostCard(props: {
 }) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
   const deletePost = useMutation(
     trpc.post.delete.mutationOptions({
       onSuccess: async () => {

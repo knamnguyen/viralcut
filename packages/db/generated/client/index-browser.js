@@ -139,6 +139,11 @@ exports.Prisma.StripePaymentScalarFieldEnum = {
 
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  primaryEmailAddress: 'primaryEmailAddress',
+  imageUrl: 'imageUrl',
+  clerkUserProperties: 'clerkUserProperties',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

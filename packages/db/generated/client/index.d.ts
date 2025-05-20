@@ -3600,18 +3600,31 @@ export namespace Prisma {
 
   export type UserMinAggregateOutputType = {
     id: string | null
+    firstName: string | null
+    lastName: string | null
+    primaryEmailAddress: string | null
+    imageUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
 
   export type UserMaxAggregateOutputType = {
     id: string | null
+    firstName: string | null
+    lastName: string | null
+    primaryEmailAddress: string | null
+    imageUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
 
   export type UserCountAggregateOutputType = {
     id: number
+    firstName: number
+    lastName: number
+    primaryEmailAddress: number
+    imageUrl: number
+    clerkUserProperties: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -3620,18 +3633,31 @@ export namespace Prisma {
 
   export type UserMinAggregateInputType = {
     id?: true
+    firstName?: true
+    lastName?: true
+    primaryEmailAddress?: true
+    imageUrl?: true
     createdAt?: true
     updatedAt?: true
   }
 
   export type UserMaxAggregateInputType = {
     id?: true
+    firstName?: true
+    lastName?: true
+    primaryEmailAddress?: true
+    imageUrl?: true
     createdAt?: true
     updatedAt?: true
   }
 
   export type UserCountAggregateInputType = {
     id?: true
+    firstName?: true
+    lastName?: true
+    primaryEmailAddress?: true
+    imageUrl?: true
+    clerkUserProperties?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -3711,6 +3737,11 @@ export namespace Prisma {
 
   export type UserGroupByOutputType = {
     id: string
+    firstName: string | null
+    lastName: string | null
+    primaryEmailAddress: string | null
+    imageUrl: string | null
+    clerkUserProperties: JsonValue | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -3734,6 +3765,11 @@ export namespace Prisma {
 
   export type UserSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    firstName?: boolean
+    lastName?: boolean
+    primaryEmailAddress?: boolean
+    imageUrl?: boolean
+    clerkUserProperties?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     entries?: boolean | User$entriesArgs<ExtArgs>
@@ -3743,23 +3779,38 @@ export namespace Prisma {
 
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    firstName?: boolean
+    lastName?: boolean
+    primaryEmailAddress?: boolean
+    imageUrl?: boolean
+    clerkUserProperties?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    firstName?: boolean
+    lastName?: boolean
+    primaryEmailAddress?: boolean
+    imageUrl?: boolean
+    clerkUserProperties?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
     id?: boolean
+    firstName?: boolean
+    lastName?: boolean
+    primaryEmailAddress?: boolean
+    imageUrl?: boolean
+    clerkUserProperties?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "firstName" | "lastName" | "primaryEmailAddress" | "imageUrl" | "clerkUserProperties" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     entries?: boolean | User$entriesArgs<ExtArgs>
     reflections?: boolean | User$reflectionsArgs<ExtArgs>
@@ -3776,6 +3827,11 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      firstName: string | null
+      lastName: string | null
+      primaryEmailAddress: string | null
+      imageUrl: string | null
+      clerkUserProperties: Prisma.JsonValue | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -4204,6 +4260,11 @@ export namespace Prisma {
    */ 
   interface UserFieldRefs {
     readonly id: FieldRef<"User", 'String'>
+    readonly firstName: FieldRef<"User", 'String'>
+    readonly lastName: FieldRef<"User", 'String'>
+    readonly primaryEmailAddress: FieldRef<"User", 'String'>
+    readonly imageUrl: FieldRef<"User", 'String'>
+    readonly clerkUserProperties: FieldRef<"User", 'Json'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -9018,6 +9079,11 @@ export namespace Prisma {
 
   export const UserScalarFieldEnum: {
     id: 'id',
+    firstName: 'firstName',
+    lastName: 'lastName',
+    primaryEmailAddress: 'primaryEmailAddress',
+    imageUrl: 'imageUrl',
+    clerkUserProperties: 'clerkUserProperties',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -9319,6 +9385,11 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     id?: StringFilter<"User"> | string
+    firstName?: StringNullableFilter<"User"> | string | null
+    lastName?: StringNullableFilter<"User"> | string | null
+    primaryEmailAddress?: StringNullableFilter<"User"> | string | null
+    imageUrl?: StringNullableFilter<"User"> | string | null
+    clerkUserProperties?: JsonNullableFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     entries?: FounderLogEntryListRelationFilter
@@ -9327,6 +9398,11 @@ export namespace Prisma {
 
   export type UserOrderByWithRelationInput = {
     id?: SortOrder
+    firstName?: SortOrderInput | SortOrder
+    lastName?: SortOrderInput | SortOrder
+    primaryEmailAddress?: SortOrderInput | SortOrder
+    imageUrl?: SortOrderInput | SortOrder
+    clerkUserProperties?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     entries?: FounderLogEntryOrderByRelationAggregateInput
@@ -9335,17 +9411,27 @@ export namespace Prisma {
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    primaryEmailAddress?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
+    firstName?: StringNullableFilter<"User"> | string | null
+    lastName?: StringNullableFilter<"User"> | string | null
+    imageUrl?: StringNullableFilter<"User"> | string | null
+    clerkUserProperties?: JsonNullableFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     entries?: FounderLogEntryListRelationFilter
     reflections?: FounderLogReflectionListRelationFilter
-  }, "id">
+  }, "id" | "primaryEmailAddress">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
+    firstName?: SortOrderInput | SortOrder
+    lastName?: SortOrderInput | SortOrder
+    primaryEmailAddress?: SortOrderInput | SortOrder
+    imageUrl?: SortOrderInput | SortOrder
+    clerkUserProperties?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -9358,6 +9444,11 @@ export namespace Prisma {
     OR?: UserScalarWhereWithAggregatesInput[]
     NOT?: UserScalarWhereWithAggregatesInput | UserScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"User"> | string
+    firstName?: StringNullableWithAggregatesFilter<"User"> | string | null
+    lastName?: StringNullableWithAggregatesFilter<"User"> | string | null
+    primaryEmailAddress?: StringNullableWithAggregatesFilter<"User"> | string | null
+    imageUrl?: StringNullableWithAggregatesFilter<"User"> | string | null
+    clerkUserProperties?: JsonNullableWithAggregatesFilter<"User">
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -9733,6 +9824,11 @@ export namespace Prisma {
 
   export type UserCreateInput = {
     id: string
+    firstName?: string | null
+    lastName?: string | null
+    primaryEmailAddress?: string | null
+    imageUrl?: string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     entries?: FounderLogEntryCreateNestedManyWithoutUserInput
@@ -9741,6 +9837,11 @@ export namespace Prisma {
 
   export type UserUncheckedCreateInput = {
     id: string
+    firstName?: string | null
+    lastName?: string | null
+    primaryEmailAddress?: string | null
+    imageUrl?: string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     entries?: FounderLogEntryUncheckedCreateNestedManyWithoutUserInput
@@ -9749,6 +9850,11 @@ export namespace Prisma {
 
   export type UserUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     entries?: FounderLogEntryUpdateManyWithoutUserNestedInput
@@ -9757,6 +9863,11 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     entries?: FounderLogEntryUncheckedUpdateManyWithoutUserNestedInput
@@ -9765,18 +9876,33 @@ export namespace Prisma {
 
   export type UserCreateManyInput = {
     id: string
+    firstName?: string | null
+    lastName?: string | null
+    primaryEmailAddress?: string | null
+    imageUrl?: string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type UserUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10214,6 +10340,21 @@ export namespace Prisma {
     _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type FounderLogEntryListRelationFilter = {
     every?: FounderLogEntryWhereInput
     some?: FounderLogEntryWhereInput
@@ -10236,20 +10377,51 @@ export namespace Prisma {
 
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    primaryEmailAddress?: SortOrder
+    imageUrl?: SortOrder
+    clerkUserProperties?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
     id?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    primaryEmailAddress?: SortOrder
+    imageUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
     id?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    primaryEmailAddress?: SortOrder
+    imageUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type FounderLogEntryTagListRelationFilter = {
@@ -10428,6 +10600,10 @@ export namespace Prisma {
     connectOrCreate?: FounderLogReflectionCreateOrConnectWithoutUserInput | FounderLogReflectionCreateOrConnectWithoutUserInput[]
     createMany?: FounderLogReflectionCreateManyUserInputEnvelope
     connect?: FounderLogReflectionWhereUniqueInput | FounderLogReflectionWhereUniqueInput[]
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
   }
 
   export type FounderLogEntryUpdateManyWithoutUserNestedInput = {
@@ -10754,6 +10930,37 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
   export type FounderLogEntryCreateWithoutUserInput = {
     id?: string
     content: string
@@ -10914,6 +11121,11 @@ export namespace Prisma {
 
   export type UserCreateWithoutEntriesInput = {
     id: string
+    firstName?: string | null
+    lastName?: string | null
+    primaryEmailAddress?: string | null
+    imageUrl?: string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     reflections?: FounderLogReflectionCreateNestedManyWithoutUserInput
@@ -10921,6 +11133,11 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutEntriesInput = {
     id: string
+    firstName?: string | null
+    lastName?: string | null
+    primaryEmailAddress?: string | null
+    imageUrl?: string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     reflections?: FounderLogReflectionUncheckedCreateNestedManyWithoutUserInput
@@ -10966,6 +11183,11 @@ export namespace Prisma {
 
   export type UserUpdateWithoutEntriesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reflections?: FounderLogReflectionUpdateManyWithoutUserNestedInput
@@ -10973,6 +11195,11 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutEntriesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reflections?: FounderLogReflectionUncheckedUpdateManyWithoutUserNestedInput
@@ -11092,6 +11319,11 @@ export namespace Prisma {
 
   export type UserCreateWithoutReflectionsInput = {
     id: string
+    firstName?: string | null
+    lastName?: string | null
+    primaryEmailAddress?: string | null
+    imageUrl?: string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     entries?: FounderLogEntryCreateNestedManyWithoutUserInput
@@ -11099,6 +11331,11 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutReflectionsInput = {
     id: string
+    firstName?: string | null
+    lastName?: string | null
+    primaryEmailAddress?: string | null
+    imageUrl?: string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     entries?: FounderLogEntryUncheckedCreateNestedManyWithoutUserInput
@@ -11122,6 +11359,11 @@ export namespace Prisma {
 
   export type UserUpdateWithoutReflectionsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     entries?: FounderLogEntryUpdateManyWithoutUserNestedInput
@@ -11129,6 +11371,11 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutReflectionsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     entries?: FounderLogEntryUncheckedUpdateManyWithoutUserNestedInput

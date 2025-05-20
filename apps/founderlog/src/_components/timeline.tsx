@@ -4,7 +4,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 
 import { useTRPC } from "~/trpc/react";
-import { EntryCard } from "./entry-card";
+import { EntryCard } from "../app/_components/entry-card";
 
 export function Timeline() {
   const trpc = useTRPC();
@@ -12,7 +12,7 @@ export function Timeline() {
     trpc.founderlog.getDashboardData.queryOptions(),
   );
 
-  if (!data || data.entries.length === 0) {
+  if (data.entries.length === 0) {
     return (
       <div className="mt-6 text-center">
         <p className="text-gray-500">

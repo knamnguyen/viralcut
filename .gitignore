@@ -40,6 +40,8 @@ yarn-error.log*
 # local env files
 .env
 .env*.local
+secrets.json
+.dev.vars
 
 # vercel
 .vercel
@@ -50,3 +52,6 @@ dist/
 
 # turbo
 .turbo
+
+# db
+../generated/prisma
