@@ -1,5 +1,7 @@
 // 1. Import PrismaClient from your custom generated path
-import { PrismaClient } from "../generated/client";
+import { PrismaClient } from "@sassy/db-node";
+
+// import { PrismaClient as PrismaClientEdge } from "../generated/client/edge";
 
 // 2. Extend the global NodeJS namespace to declare a 'cachedPrisma' variable
 declare global {
@@ -35,4 +37,24 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // 5. Export the Prisma client instance as 'db' (or 'prisma')
-export const db = prisma; // Or 'export const prisma = prisma;'
+export type { PrismaClient as PrismaClientType } from "@sassy/db-node";
+export const db = prisma;
+
+// // Create a clean Edge client without any global references
+// // Each request will get a fresh instance
+// export const dbEdge = new PrismaClientEdge({
+//   datasources: {
+//     db: {
+//       url: process.env.DATABASE_URL,
+//     },
+//   },
+// });
+// // Export the PrismaClient type for convenience if needed elsewhere
+// export type { PrismaClient as PrismaClientType } from "../generated/client";
+
+// // Export Prisma's transaction type.
+// // This is the type of the `prisma` client passed to the transaction callback.
+// // It's essentially a PrismaClient but scoped to the transaction.
+// export type PrismaTransactionClient = Parameters<
+//   Parameters<PrismaClient["$transaction"]>[0]
+// >[0];

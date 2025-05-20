@@ -1,6 +1,6 @@
 # Clerk webhook signing secret
 # Get this from Clerk Dashboard > Webhooks > Your Endpoint > Signing Secret
-CLERK_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+CLERK_WEBHOOK_SECRET="whsec_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 # Database connection strings
 # These should match your development database settings

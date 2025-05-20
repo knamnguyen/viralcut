@@ -6,14 +6,15 @@
  * tl;dr - this is where all the tRPC server stuff is created and plugged in.
  * The pieces you will need to use are documented accordingly near the end
  */
+
 import type { User } from "@clerk/nextjs/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-import { z, ZodError } from "zod";
+import { ZodError } from "zod";
 
-import { db, Prisma } from "@sassy/db";
-import { StripePaymentSchema } from "@sassy/db/schema-validators";
+import type { PrismaClientType } from "@sassy/db/client";
+import { db } from "@sassy/db";
 
 /**
  * 1. CONTEXT
@@ -27,6 +28,10 @@ import { StripePaymentSchema } from "@sassy/db/schema-validators";
  *
  * @see https://trpc.io/docs/server/context
  */
+
+interface TRPCContextBase {
+  db: PrismaClientType;
+}
 export interface TRPCContext {
   db: typeof db;
   user?: User;
@@ -61,6 +66,29 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 });
 
 /**
+ * Clerk authentication middleware
+ * This middleware checks if the user is authenticated using Clerk's currentUser() function
+ * and adds the user to the context if authenticated
+ */
+const isAuthed = t.middleware(async ({ ctx, next }) => {
+  const user = await currentUser();
+
+  if (!user) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Not authenticated",
+    });
+  }
+
+  return next({
+    ctx: {
+      ...ctx, // Keep existing context with db
+      user, // Add the user to the context
+    },
+  });
+});
+
+/**
  * Create a server-side caller
  * @see https://trpc.io/docs/server/server-side-calls
  */
@@ -87,29 +115,6 @@ export const createTRPCRouter = t.router;
  * can still access user session data if they are logged in
  */
 export const publicProcedure = t.procedure;
-
-/**
- * Clerk authentication middleware
- * This middleware checks if the user is authenticated using Clerk's currentUser() function
- * and adds the user to the context if authenticated
- */
-const isAuthed = t.middleware(async ({ ctx, next }) => {
-  const user = await currentUser();
-
-  if (!user) {
-    throw new TRPCError({
-      code: "UNAUTHORIZED",
-      message: "Not authenticated",
-    });
-  }
-
-  return next({
-    ctx: {
-      ...ctx, // Keep existing context with db
-      user, // Add the user to the context
-    },
-  });
-});
 
 /**
  * Protected (authenticated) procedure

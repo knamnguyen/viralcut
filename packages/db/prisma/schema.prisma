@@ -5,10 +5,19 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 //binaryTargets to handle the client for production environment on vercel
+//specify output locations so that path resolve work with turbo repo
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/client"
+  output   = "../generated/node"
   binaryTargets = ["native", "rhel-openssl-3.0.x", "linux-arm64-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+// Dedicated edge client for Cloudflare Workers
+generator edge {
+  provider = "prisma-client-js"
+  output   = "../generated/edge"
+  binaryTargets = ["native"]
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -50,6 +59,7 @@ model User {
   id                  String               @id // This is the Clerk ID
   firstName           String?
   lastName            String?
+  username            String?              @unique
   primaryEmailAddress String?              @unique
   imageUrl            String?
   clerkUserProperties Json?                // Made optional to preserve existing data

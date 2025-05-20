@@ -1,9 +1,13 @@
 name = "founderlog-webhook-handler"
 main = "src/index.ts"
-compatibility_date = "2023-10-30"
 
-# Use the latest Node.js compatibility flags
-compatibility_flags = ["nodejs_compat"]
+
+compatibility_flags = [ "nodejs_compat" ]
+compatibility_date = "2024-09-23"
+
+# Define a fixed port for development
+[dev]
+port = 5000
 
 # Non-sensitive environment variables
 [vars]
@@ -27,10 +31,6 @@ NODE_ENV = "production"
 # - `wrangler secret:bulk PUT_FILENAME` to add multiple secrets at once
 
 # Secret variables that must be added via wrangler secret commands
-[secrets]
-CLERK_WEBHOOK_SECRET = ""
-DATABASE_URL = ""
-DIRECT_URL = ""
 
 # Specify service bindings like KV, Durable Objects, R2, etc. if needed
 # For example, to use KV:

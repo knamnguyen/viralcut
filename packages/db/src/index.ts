@@ -1,4 +1,8 @@
-export * from "../generated/client";
-export { Prisma } from "../generated/client";
+export * from "../generated/node";
+export { Prisma } from "../generated/node";
 export { db } from "./client";
-// export * from "./schema-validators";
+export { PrismaClientEdge } from "./edge";
+
+// export type DatabaseTransaction = Parameters<
+//   Parameters<(typeof db)["transaction"]>[0]
+// >[0];
