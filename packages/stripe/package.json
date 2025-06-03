@@ -5,7 +5,8 @@
   "type": "module",
   "__cmt1": "//info using just in time package export so no need to worry about build step shit",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./schema-validators": "./src/schema-validators.ts"
   },
   "license": "MIT",
   "scripts": {
@@ -13,10 +14,13 @@
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
-    "with-env": "dotenv -e ../../.env --"
+    "with-env": "dotenv -e ../../.env --",
+    "stripe:prices": "pnpm with-env bun ./scripts/importProductsAndPrices.ts",
+    "stripe:portal": "pnpm with-env bun ./scripts/setupCustomerPortal.ts"
   },
   "dependencies": {
     "@sassy/db": "workspace:*",
+    "csv-parse": "^5.5.4",
     "stripe": "^13.9.0",
     "zod": "^3.22.4"
   },

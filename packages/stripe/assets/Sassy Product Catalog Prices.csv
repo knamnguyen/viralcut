@@ -1,0 +1,4 @@
+Price ID,Product ID,Product Name,Product Statement Descriptor,Product Tax Code,Description,Created (UTC),Amount,Currency,Interval,Interval Count,Usage Type,Aggregate Usage,Billing Scheme,Trial Period Days,Tax Behavior
+price_1RRugjRQf2ptbFsnuYp4QpOX,prod_SMdyKsxHvZLm3L,Lifetime,,txcd_10103000,,2025-05-23 12:27,200.00,hkd,,,,,per_unit,,unspecified
+price_1R3bQuRQf2ptbFsnsuVDyAnt,prod_RxWTt3Py1f7gvF,Yearly,Sample description.,txcd_10103000,,2025-03-17 11:02,89.00,usd,year,1,licensed,,per_unit,,unspecified
+price_1R3awyRQf2ptbFsn64UnVAmI,prod_RxVyOOcNMLC1Sk,Monthly,Sample descriptor,txcd_10103000,,2025-03-17 10:31,9.99,usd,month,1,licensed,,per_unit,,unspecified

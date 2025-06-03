@@ -1,5 +1,9 @@
 {
   "extends": "@sassy/tsconfig/internal-package.json",
   "include": ["."],
-  "exclude": ["dist", "build", "node_modules", "generated"]
+  "exclude": ["dist", "build", "node_modules", "generated"],
+  "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": true
+  }
 }

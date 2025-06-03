@@ -19,7 +19,7 @@ export function useSubscription() {
 
   return {
     hasAccess: data?.hasAccess ?? false,
-    accessType: data?.accessType ?? "none",
+    accessType: data?.accessType ?? "FREE",
     isLoading,
     error,
   };

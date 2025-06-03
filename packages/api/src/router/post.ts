@@ -1,7 +1,7 @@
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 
-import { CreatePostSchema } from "@sassy/db/schema-validators";
+import { PostCreateInputSchema } from "@sassy/db/schema-validators";
 
 import { protectedProcedure, publicProcedure } from "../trpc";
 
@@ -26,7 +26,7 @@ export const postRouter = {
     }),
 
   create: protectedProcedure
-    .input(CreatePostSchema)
+    .input(PostCreateInputSchema)
     .mutation(({ ctx, input }) => {
       return ctx.db.post.create({
         data: input,

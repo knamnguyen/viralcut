@@ -3,10 +3,13 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-// import type { Prisma } from "@sassy/db";
-import { StripePaymentSchema } from "@sassy/db/schema-validators";
 import { StripeService } from "@sassy/stripe";
+import {
+  createCheckoutSchema,
+  createCustomerPortalSchema,
+} from "@sassy/stripe/schema-validators";
 
+import type { TRPCContext } from "../trpc";
 import { protectedProcedure } from "../trpc";
 
 /**
@@ -18,60 +21,48 @@ const stripeService = new StripeService({
   webhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
 });
 
-//TODO: check if this is the case
+/**
+ * Utility function for checking access type
+ */
+const checkAccessType = async (ctx: TRPCContext) => {
+  const user = await ctx.db.user.findUnique({
+    where: { id: ctx.user?.id },
+  });
+  const access = user?.accessType;
+  return access;
+};
+
 export const stripeRouter = {
   /**
    * Create a checkout session for subscription or one-time payment
    *
-   * @param priceId - Stripe price ID
-   * @param mode - "subscription" for recurring, "payment" for one-time
+   * @param purchaseType - Type of purchase (MONTHLY, YEARLY, LIFETIME)
    * @returns URL to redirect to Stripe checkout
    */
-
   createCheckout: protectedProcedure
-    .input(
-      z.object({
-        priceId: z.string(), // Stripe price ID
-        mode: z.enum(["subscription", "payment"]).default("subscription"),
-        metadata: z.record(z.string()).optional(),
-      }),
-    )
+    .input(createCheckoutSchema)
     .mutation(async ({ ctx, input }) => {
-      // Get authenticated user from context
-      if (!ctx.user) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "User not authenticated",
-        });
-      }
+      if (!ctx.user) throw new Error("User not authenticated");
+      //if user already has lifetime subscription, don't allow config or checkout
+      const access = await checkAccessType(ctx);
+      if (access === "MONTHLY" || access === "YEARLY")
+        throw new Error(
+          "User already has a subscription, click manage subscription to change plan",
+        );
+      if (access === "LIFETIME")
+        throw new Error("User already has lifetime subscription");
 
       const userId = ctx.user.id;
-
-      // Get user email
       const email = ctx.user.emailAddresses[0]?.emailAddress;
 
-      if (!email) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "User email is required",
-        });
-      }
-
-      // Get origin for redirect URLs
-      const origin = process.env.NEXTJS_URL ?? "http://localhost:3000";
-
       // Create checkout session with Stripe
-      return stripeService.createCheckoutSession(
+      const checkoutUrl = await stripeService.createCheckoutSession(
         userId, // Clerk user ID
+        input.purchaseType,
         email,
-        {
-          priceId: input.priceId,
-          mode: input.mode,
-          successUrl: `${origin}/?payment=success`,
-          cancelUrl: `${origin}/?payment=canceled`,
-          metadata: input.metadata,
-        },
       );
+
+      return checkoutUrl;
     }),
 
   /**
@@ -80,19 +71,13 @@ export const stripeRouter = {
    * @returns URL to redirect to Stripe customer portal
    */
   createCustomerPortal: protectedProcedure
-    .input(
-      z.object({
-        returnUrl: z.string().optional(),
-      }),
-    )
+    .input(createCustomerPortalSchema)
     .mutation(async ({ ctx, input }) => {
-      // Get authenticated user from context
-      if (!ctx.user) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "User not authenticated",
-        });
-      }
+      if (!ctx.user) throw new Error("User not authenticated");
+      //if user already has lifetime subscription, don't allow config or checkout
+      const access = await checkAccessType(ctx);
+      if (access === "LIFETIME")
+        throw new Error("User already has lifetime subscription");
 
       const userId = ctx.user.id;
 
@@ -116,47 +101,13 @@ export const stripeRouter = {
       return result;
     }),
 
-  /**
-   * Check if user has access (subscription or lifetime)
-   * This queries Stripe directly rather than a local database
-   *
-   * @returns Access status information
-   */
   checkAccess: protectedProcedure.query(async ({ ctx }) => {
-    if (!ctx.user) {
-      return { hasAccess: false, accessType: "none" };
-    }
+    if (!ctx.user) throw new Error("User not authenticated");
+    const access = await checkAccessType(ctx);
 
-    const access = await stripeService.checkAccess(ctx.user.id);
-    return access;
+    const hasAccess = access !== "FREE";
+    return { hasAccess, accessType: access };
   }),
-
-  recordPayment: protectedProcedure
-    .input(StripePaymentSchema)
-    .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "User not authenticated",
-        });
-      }
-
-      const dataToInsert = {
-        clerkUserId: ctx.user.id,
-        amount: input.amount,
-        currency: input.currency,
-        status: input.status,
-        stripePaymentId: input.stripePaymentId,
-        metadata: input.metadata,
-      };
-
-      // Store the payment in the database
-      // This is not happening by the way
-      const result = await ctx.db.stripePayment.create({
-        data: dataToInsert,
-      });
-      return result;
-    }),
 } satisfies TRPCRouterRecord;
 
 //prevent type leakage issues across your entire Turborepo while maintaining proper type checking during development

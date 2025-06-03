@@ -1,0 +1,4 @@
+id,Name,Type,Date (UTC),Description,Statement Descriptor,Unit Label,Url,Tax Code
+prod_SMdyKsxHvZLm3L,Lifetime,service,2025-05-23 12:27,Lifetime,,,,txcd_10103000
+prod_RxWTt3Py1f7gvF,Yearly,service,2025-03-17 11:02,Sample description.,Sample description.,Sample.,,txcd_10103000
+prod_RxVyOOcNMLC1Sk,Monthly,service,2025-03-17 10:31,Sample description.,Sample descriptor,Sample Unit,,txcd_10103000

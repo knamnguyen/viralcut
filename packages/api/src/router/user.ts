@@ -3,19 +3,28 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import {
-  userCreateSchema,
-  userUpdateSchema,
+  UserCreateInputSchema,
+  UserUpdateInputSchema,
 } from "@sassy/db/schema-validators";
+
+// import {
+//   userCreateSchema,
+//   userUpdateSchema,
+// } from "@sassy/db/schema-validators";
 
 import { protectedProcedure, publicProcedure } from "../trpc";
 
 export const userRouter = {
-  /**
-   * Create a new user in the database
-   * This is primarily used by the webhook handler
-   */
+  checkAccess: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({
+      where: { id: ctx.user?.id },
+    });
+    const access = user?.accessType;
+    return access;
+  }),
+
   create: publicProcedure
-    .input(userCreateSchema)
+    .input(UserCreateInputSchema)
     .mutation(async ({ ctx, input }) => {
       try {
         return await ctx.db.user.create({
@@ -46,7 +55,7 @@ export const userRouter = {
     .input(
       z.object({
         id: z.string(),
-        data: userUpdateSchema,
+        data: UserUpdateInputSchema,
       }),
     )
     .mutation(async ({ ctx, input }) => {

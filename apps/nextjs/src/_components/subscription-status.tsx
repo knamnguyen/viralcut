@@ -75,7 +75,7 @@ export function SubscriptionStatus() {
       {hasAccess ? (
         <div className="rounded-md bg-green-50 px-4 py-2 text-green-700">
           {`Your ${accessType} access is now active!`}
-          {(accessType === "monthly" || accessType === "yearly") && (
+          {(accessType === "MONTHLY" || accessType === "YEARLY") && (
             <div className="mt-2">
               <ManageSubscriptionButton
                 buttonText="Manage billing"
@@ -106,8 +106,7 @@ export function SubscriptionStatus() {
                 </ul>
                 {isSignedIn ? (
                   <SubscribeButton
-                    priceId="price_1R3eUoRQf2ptbFsnXfCxNoDq"
-                    mode="subscription"
+                    purchaseType="MONTHLY"
                     buttonText="Subscribe Monthly"
                     className="w-full rounded-lg bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700"
                   />
@@ -129,8 +128,7 @@ export function SubscriptionStatus() {
                 </ul>
                 {isSignedIn ? (
                   <SubscribeButton
-                    priceId="price_1R3eUJRQf2ptbFsnHuI2Kd3L"
-                    mode="subscription"
+                    purchaseType="YEARLY"
                     buttonText="Subscribe Yearly"
                     className="w-full rounded-lg bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700"
                   />
@@ -152,8 +150,7 @@ export function SubscriptionStatus() {
                 </ul>
                 {isSignedIn ? (
                   <SubscribeButton
-                    priceId="price_1R3eTqRQf2ptbFsnqzXdqDqe"
-                    mode="payment"
+                    purchaseType="LIFETIME"
                     buttonText="Buy Lifetime Access"
                     className="w-full rounded-lg bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700"
                   />

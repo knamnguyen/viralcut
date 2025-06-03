@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-query";
 
 import type { RouterOutputs } from "@sassy/api";
-import { CreatePostSchema } from "@sassy/db";
+import { PostCreateInputSchema } from "@sassy/db/schema-validators";
 import { Button } from "@sassy/ui/button";
 import {
   Form,
@@ -25,7 +25,7 @@ import { useTRPC } from "~/trpc/react";
 
 export function CreatePostForm() {
   const form = useForm({
-    schema: CreatePostSchema,
+    schema: PostCreateInputSchema,
     defaultValues: {
       content: "",
       title: "",

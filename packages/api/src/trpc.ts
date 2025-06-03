@@ -13,7 +13,6 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
-import type { PrismaClientType } from "@sassy/db/client";
 import { db } from "@sassy/db";
 
 /**
@@ -29,9 +28,6 @@ import { db } from "@sassy/db";
  * @see https://trpc.io/docs/server/context
  */
 
-interface TRPCContextBase {
-  db: PrismaClientType;
-}
 export interface TRPCContext {
   db: typeof db;
   user?: User;
@@ -41,7 +37,6 @@ export const createTRPCContext = async (opts: {
   headers: Headers;
 }): Promise<TRPCContext> => {
   console.log(">>> tRPC Request from", "by");
-
   return {
     db,
     // Note: User will be added by the auth middleware when needed

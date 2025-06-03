@@ -15,7 +15,7 @@ export default function SubscriptionPage() {
 
   // Whether to show the manage subscription button (only for subscription users, not lifetime)
   const showManageSubscription =
-    hasAccess && (accessType === "monthly" || accessType === "yearly");
+    hasAccess && (accessType === "MONTHLY" || accessType === "YEARLY");
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -53,8 +53,7 @@ export default function SubscriptionPage() {
             </ul>
             {isSignedIn ? (
               <SubscribeButton
-                priceId="price_1R3eUoRQf2ptbFsnXfCxNoDq" // Replace with your price ID
-                mode="subscription"
+                purchaseType="MONTHLY"
                 buttonText="Subscribe Monthly"
                 className="w-full rounded-lg bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700"
               />
@@ -77,8 +76,7 @@ export default function SubscriptionPage() {
             </ul>
             {isSignedIn ? (
               <SubscribeButton
-                priceId="price_1R3eUJRQf2ptbFsnHuI2Kd3L" // Replace with your price ID
-                mode="subscription"
+                purchaseType="YEARLY"
                 buttonText="Subscribe Yearly"
                 className="w-full rounded-lg bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700"
               />
@@ -101,8 +99,7 @@ export default function SubscriptionPage() {
             </ul>
             {isSignedIn ? (
               <SubscribeButton
-                priceId="price_1R3eTqRQf2ptbFsnqzXdqDqe" // Replace with your price ID
-                mode="payment"
+                purchaseType="LIFETIME"
                 buttonText="Buy Lifetime Access"
                 className="w-full rounded-lg bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700"
               />
@@ -122,7 +119,9 @@ export default function SubscriptionPage() {
         </p>
         <ol className="list-inside list-decimal space-y-2">
           <li>Create products and prices in your Stripe dashboard</li>
-          <li>Update the price IDs in the buttons above</li>
+          <li>
+            Update the price IDs in the stripe package schema-validators.ts
+          </li>
           <li>
             Set up a webhook endpoint in Stripe that points to{" "}
             <code className="rounded bg-gray-200 px-2 py-1">

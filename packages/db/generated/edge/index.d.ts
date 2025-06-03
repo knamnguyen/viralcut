@@ -19,11 +19,6 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type Post = $Result.DefaultSelection<Prisma.$PostPayload>
 /**
- * Model StripePayment
- * 
- */
-export type StripePayment = $Result.DefaultSelection<Prisma.$StripePaymentPayload>
-/**
  * Model User
  * 
  */
@@ -48,6 +43,26 @@ export type FounderLogEntryTag = $Result.DefaultSelection<Prisma.$FounderLogEntr
  * 
  */
 export type FounderLogReflection = $Result.DefaultSelection<Prisma.$FounderLogReflectionPayload>
+
+/**
+ * Enums
+ */
+export namespace $Enums {
+  export const AccessType: {
+  TRIAL: 'TRIAL',
+  FREE: 'FREE',
+  LIFETIME: 'LIFETIME',
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY'
+};
+
+export type AccessType = (typeof AccessType)[keyof typeof AccessType]
+
+}
+
+export type AccessType = $Enums.AccessType
+
+export const AccessType: typeof $Enums.AccessType
 
 /**
  * ##  Prisma Client ʲˢ
@@ -183,16 +198,6 @@ export class PrismaClient<
     * ```
     */
   get post(): Prisma.PostDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.stripePayment`: Exposes CRUD operations for the **StripePayment** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more StripePayments
-    * const stripePayments = await prisma.stripePayment.findMany()
-    * ```
-    */
-  get stripePayment(): Prisma.StripePaymentDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.user`: Exposes CRUD operations for the **User** model.
@@ -684,7 +689,6 @@ export namespace Prisma {
 
   export const ModelName: {
     Post: 'Post',
-    StripePayment: 'StripePayment',
     User: 'User',
     FounderLogTag: 'FounderLogTag',
     FounderLogEntry: 'FounderLogEntry',
@@ -708,7 +712,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "post" | "stripePayment" | "user" | "founderLogTag" | "founderLogEntry" | "founderLogEntryTag" | "founderLogReflection"
+      modelProps: "post" | "user" | "founderLogTag" | "founderLogEntry" | "founderLogEntryTag" | "founderLogReflection"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -783,80 +787,6 @@ export namespace Prisma {
           count: {
             args: Prisma.PostCountArgs<ExtArgs>
             result: $Utils.Optional<PostCountAggregateOutputType> | number
-          }
-        }
-      }
-      StripePayment: {
-        payload: Prisma.$StripePaymentPayload<ExtArgs>
-        fields: Prisma.StripePaymentFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.StripePaymentFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StripePaymentPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.StripePaymentFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StripePaymentPayload>
-          }
-          findFirst: {
-            args: Prisma.StripePaymentFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StripePaymentPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.StripePaymentFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StripePaymentPayload>
-          }
-          findMany: {
-            args: Prisma.StripePaymentFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StripePaymentPayload>[]
-          }
-          create: {
-            args: Prisma.StripePaymentCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StripePaymentPayload>
-          }
-          createMany: {
-            args: Prisma.StripePaymentCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.StripePaymentCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StripePaymentPayload>[]
-          }
-          delete: {
-            args: Prisma.StripePaymentDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StripePaymentPayload>
-          }
-          update: {
-            args: Prisma.StripePaymentUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StripePaymentPayload>
-          }
-          deleteMany: {
-            args: Prisma.StripePaymentDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.StripePaymentUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.StripePaymentUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StripePaymentPayload>[]
-          }
-          upsert: {
-            args: Prisma.StripePaymentUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StripePaymentPayload>
-          }
-          aggregate: {
-            args: Prisma.StripePaymentAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateStripePayment>
-          }
-          groupBy: {
-            args: Prisma.StripePaymentGroupByArgs<ExtArgs>
-            result: $Utils.Optional<StripePaymentGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.StripePaymentCountArgs<ExtArgs>
-            result: $Utils.Optional<StripePaymentCountAggregateOutputType> | number
           }
         }
       }
@@ -1319,7 +1249,6 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     post?: PostOmit
-    stripePayment?: StripePaymentOmit
     user?: UserOmit
     founderLogTag?: FounderLogTagOmit
     founderLogEntry?: FounderLogEntryOmit
@@ -2516,1083 +2445,6 @@ export namespace Prisma {
 
 
   /**
-   * Model StripePayment
-   */
-
-  export type AggregateStripePayment = {
-    _count: StripePaymentCountAggregateOutputType | null
-    _avg: StripePaymentAvgAggregateOutputType | null
-    _sum: StripePaymentSumAggregateOutputType | null
-    _min: StripePaymentMinAggregateOutputType | null
-    _max: StripePaymentMaxAggregateOutputType | null
-  }
-
-  export type StripePaymentAvgAggregateOutputType = {
-    amount: number | null
-  }
-
-  export type StripePaymentSumAggregateOutputType = {
-    amount: number | null
-  }
-
-  export type StripePaymentMinAggregateOutputType = {
-    id: string | null
-    clerkUserId: string | null
-    amount: number | null
-    currency: string | null
-    status: string | null
-    stripePaymentId: string | null
-    createdAt: Date | null
-    updatedAt: Date | null
-  }
-
-  export type StripePaymentMaxAggregateOutputType = {
-    id: string | null
-    clerkUserId: string | null
-    amount: number | null
-    currency: string | null
-    status: string | null
-    stripePaymentId: string | null
-    createdAt: Date | null
-    updatedAt: Date | null
-  }
-
-  export type StripePaymentCountAggregateOutputType = {
-    id: number
-    clerkUserId: number
-    amount: number
-    currency: number
-    status: number
-    stripePaymentId: number
-    metadata: number
-    createdAt: number
-    updatedAt: number
-    _all: number
-  }
-
-
-  export type StripePaymentAvgAggregateInputType = {
-    amount?: true
-  }
-
-  export type StripePaymentSumAggregateInputType = {
-    amount?: true
-  }
-
-  export type StripePaymentMinAggregateInputType = {
-    id?: true
-    clerkUserId?: true
-    amount?: true
-    currency?: true
-    status?: true
-    stripePaymentId?: true
-    createdAt?: true
-    updatedAt?: true
-  }
-
-  export type StripePaymentMaxAggregateInputType = {
-    id?: true
-    clerkUserId?: true
-    amount?: true
-    currency?: true
-    status?: true
-    stripePaymentId?: true
-    createdAt?: true
-    updatedAt?: true
-  }
-
-  export type StripePaymentCountAggregateInputType = {
-    id?: true
-    clerkUserId?: true
-    amount?: true
-    currency?: true
-    status?: true
-    stripePaymentId?: true
-    metadata?: true
-    createdAt?: true
-    updatedAt?: true
-    _all?: true
-  }
-
-  export type StripePaymentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which StripePayment to aggregate.
-     */
-    where?: StripePaymentWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of StripePayments to fetch.
-     */
-    orderBy?: StripePaymentOrderByWithRelationInput | StripePaymentOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: StripePaymentWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` StripePayments from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` StripePayments.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned StripePayments
-    **/
-    _count?: true | StripePaymentCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: StripePaymentAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: StripePaymentSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: StripePaymentMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: StripePaymentMaxAggregateInputType
-  }
-
-  export type GetStripePaymentAggregateType<T extends StripePaymentAggregateArgs> = {
-        [P in keyof T & keyof AggregateStripePayment]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateStripePayment[P]>
-      : GetScalarType<T[P], AggregateStripePayment[P]>
-  }
-
-
-
-
-  export type StripePaymentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StripePaymentWhereInput
-    orderBy?: StripePaymentOrderByWithAggregationInput | StripePaymentOrderByWithAggregationInput[]
-    by: StripePaymentScalarFieldEnum[] | StripePaymentScalarFieldEnum
-    having?: StripePaymentScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: StripePaymentCountAggregateInputType | true
-    _avg?: StripePaymentAvgAggregateInputType
-    _sum?: StripePaymentSumAggregateInputType
-    _min?: StripePaymentMinAggregateInputType
-    _max?: StripePaymentMaxAggregateInputType
-  }
-
-  export type StripePaymentGroupByOutputType = {
-    id: string
-    clerkUserId: string
-    amount: number
-    currency: string
-    status: string
-    stripePaymentId: string
-    metadata: JsonValue | null
-    createdAt: Date
-    updatedAt: Date
-    _count: StripePaymentCountAggregateOutputType | null
-    _avg: StripePaymentAvgAggregateOutputType | null
-    _sum: StripePaymentSumAggregateOutputType | null
-    _min: StripePaymentMinAggregateOutputType | null
-    _max: StripePaymentMaxAggregateOutputType | null
-  }
-
-  type GetStripePaymentGroupByPayload<T extends StripePaymentGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<StripePaymentGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof StripePaymentGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], StripePaymentGroupByOutputType[P]>
-            : GetScalarType<T[P], StripePaymentGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type StripePaymentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    clerkUserId?: boolean
-    amount?: boolean
-    currency?: boolean
-    status?: boolean
-    stripePaymentId?: boolean
-    metadata?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["stripePayment"]>
-
-  export type StripePaymentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    clerkUserId?: boolean
-    amount?: boolean
-    currency?: boolean
-    status?: boolean
-    stripePaymentId?: boolean
-    metadata?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["stripePayment"]>
-
-  export type StripePaymentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    clerkUserId?: boolean
-    amount?: boolean
-    currency?: boolean
-    status?: boolean
-    stripePaymentId?: boolean
-    metadata?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["stripePayment"]>
-
-  export type StripePaymentSelectScalar = {
-    id?: boolean
-    clerkUserId?: boolean
-    amount?: boolean
-    currency?: boolean
-    status?: boolean
-    stripePaymentId?: boolean
-    metadata?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-  }
-
-  export type StripePaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clerkUserId" | "amount" | "currency" | "status" | "stripePaymentId" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["stripePayment"]>
-
-  export type $StripePaymentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "StripePayment"
-    objects: {}
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      clerkUserId: string
-      amount: number
-      currency: string
-      status: string
-      stripePaymentId: string
-      metadata: Prisma.JsonValue | null
-      createdAt: Date
-      updatedAt: Date
-    }, ExtArgs["result"]["stripePayment"]>
-    composites: {}
-  }
-
-  type StripePaymentGetPayload<S extends boolean | null | undefined | StripePaymentDefaultArgs> = $Result.GetResult<Prisma.$StripePaymentPayload, S>
-
-  type StripePaymentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<StripePaymentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: StripePaymentCountAggregateInputType | true
-    }
-
-  export interface StripePaymentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StripePayment'], meta: { name: 'StripePayment' } }
-    /**
-     * Find zero or one StripePayment that matches the filter.
-     * @param {StripePaymentFindUniqueArgs} args - Arguments to find a StripePayment
-     * @example
-     * // Get one StripePayment
-     * const stripePayment = await prisma.stripePayment.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends StripePaymentFindUniqueArgs>(args: SelectSubset<T, StripePaymentFindUniqueArgs<ExtArgs>>): Prisma__StripePaymentClient<$Result.GetResult<Prisma.$StripePaymentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one StripePayment that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {StripePaymentFindUniqueOrThrowArgs} args - Arguments to find a StripePayment
-     * @example
-     * // Get one StripePayment
-     * const stripePayment = await prisma.stripePayment.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends StripePaymentFindUniqueOrThrowArgs>(args: SelectSubset<T, StripePaymentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StripePaymentClient<$Result.GetResult<Prisma.$StripePaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first StripePayment that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StripePaymentFindFirstArgs} args - Arguments to find a StripePayment
-     * @example
-     * // Get one StripePayment
-     * const stripePayment = await prisma.stripePayment.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends StripePaymentFindFirstArgs>(args?: SelectSubset<T, StripePaymentFindFirstArgs<ExtArgs>>): Prisma__StripePaymentClient<$Result.GetResult<Prisma.$StripePaymentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first StripePayment that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StripePaymentFindFirstOrThrowArgs} args - Arguments to find a StripePayment
-     * @example
-     * // Get one StripePayment
-     * const stripePayment = await prisma.stripePayment.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends StripePaymentFindFirstOrThrowArgs>(args?: SelectSubset<T, StripePaymentFindFirstOrThrowArgs<ExtArgs>>): Prisma__StripePaymentClient<$Result.GetResult<Prisma.$StripePaymentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more StripePayments that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StripePaymentFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all StripePayments
-     * const stripePayments = await prisma.stripePayment.findMany()
-     * 
-     * // Get first 10 StripePayments
-     * const stripePayments = await prisma.stripePayment.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const stripePaymentWithIdOnly = await prisma.stripePayment.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends StripePaymentFindManyArgs>(args?: SelectSubset<T, StripePaymentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StripePaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a StripePayment.
-     * @param {StripePaymentCreateArgs} args - Arguments to create a StripePayment.
-     * @example
-     * // Create one StripePayment
-     * const StripePayment = await prisma.stripePayment.create({
-     *   data: {
-     *     // ... data to create a StripePayment
-     *   }
-     * })
-     * 
-     */
-    create<T extends StripePaymentCreateArgs>(args: SelectSubset<T, StripePaymentCreateArgs<ExtArgs>>): Prisma__StripePaymentClient<$Result.GetResult<Prisma.$StripePaymentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many StripePayments.
-     * @param {StripePaymentCreateManyArgs} args - Arguments to create many StripePayments.
-     * @example
-     * // Create many StripePayments
-     * const stripePayment = await prisma.stripePayment.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends StripePaymentCreateManyArgs>(args?: SelectSubset<T, StripePaymentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many StripePayments and returns the data saved in the database.
-     * @param {StripePaymentCreateManyAndReturnArgs} args - Arguments to create many StripePayments.
-     * @example
-     * // Create many StripePayments
-     * const stripePayment = await prisma.stripePayment.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many StripePayments and only return the `id`
-     * const stripePaymentWithIdOnly = await prisma.stripePayment.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends StripePaymentCreateManyAndReturnArgs>(args?: SelectSubset<T, StripePaymentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StripePaymentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a StripePayment.
-     * @param {StripePaymentDeleteArgs} args - Arguments to delete one StripePayment.
-     * @example
-     * // Delete one StripePayment
-     * const StripePayment = await prisma.stripePayment.delete({
-     *   where: {
-     *     // ... filter to delete one StripePayment
-     *   }
-     * })
-     * 
-     */
-    delete<T extends StripePaymentDeleteArgs>(args: SelectSubset<T, StripePaymentDeleteArgs<ExtArgs>>): Prisma__StripePaymentClient<$Result.GetResult<Prisma.$StripePaymentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one StripePayment.
-     * @param {StripePaymentUpdateArgs} args - Arguments to update one StripePayment.
-     * @example
-     * // Update one StripePayment
-     * const stripePayment = await prisma.stripePayment.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends StripePaymentUpdateArgs>(args: SelectSubset<T, StripePaymentUpdateArgs<ExtArgs>>): Prisma__StripePaymentClient<$Result.GetResult<Prisma.$StripePaymentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more StripePayments.
-     * @param {StripePaymentDeleteManyArgs} args - Arguments to filter StripePayments to delete.
-     * @example
-     * // Delete a few StripePayments
-     * const { count } = await prisma.stripePayment.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends StripePaymentDeleteManyArgs>(args?: SelectSubset<T, StripePaymentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more StripePayments.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StripePaymentUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many StripePayments
-     * const stripePayment = await prisma.stripePayment.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends StripePaymentUpdateManyArgs>(args: SelectSubset<T, StripePaymentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more StripePayments and returns the data updated in the database.
-     * @param {StripePaymentUpdateManyAndReturnArgs} args - Arguments to update many StripePayments.
-     * @example
-     * // Update many StripePayments
-     * const stripePayment = await prisma.stripePayment.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more StripePayments and only return the `id`
-     * const stripePaymentWithIdOnly = await prisma.stripePayment.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends StripePaymentUpdateManyAndReturnArgs>(args: SelectSubset<T, StripePaymentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StripePaymentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one StripePayment.
-     * @param {StripePaymentUpsertArgs} args - Arguments to update or create a StripePayment.
-     * @example
-     * // Update or create a StripePayment
-     * const stripePayment = await prisma.stripePayment.upsert({
-     *   create: {
-     *     // ... data to create a StripePayment
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the StripePayment we want to update
-     *   }
-     * })
-     */
-    upsert<T extends StripePaymentUpsertArgs>(args: SelectSubset<T, StripePaymentUpsertArgs<ExtArgs>>): Prisma__StripePaymentClient<$Result.GetResult<Prisma.$StripePaymentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of StripePayments.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StripePaymentCountArgs} args - Arguments to filter StripePayments to count.
-     * @example
-     * // Count the number of StripePayments
-     * const count = await prisma.stripePayment.count({
-     *   where: {
-     *     // ... the filter for the StripePayments we want to count
-     *   }
-     * })
-    **/
-    count<T extends StripePaymentCountArgs>(
-      args?: Subset<T, StripePaymentCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], StripePaymentCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a StripePayment.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StripePaymentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends StripePaymentAggregateArgs>(args: Subset<T, StripePaymentAggregateArgs>): Prisma.PrismaPromise<GetStripePaymentAggregateType<T>>
-
-    /**
-     * Group by StripePayment.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StripePaymentGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends StripePaymentGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: StripePaymentGroupByArgs['orderBy'] }
-        : { orderBy?: StripePaymentGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, StripePaymentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStripePaymentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the StripePayment model
-   */
-  readonly fields: StripePaymentFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for StripePayment.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__StripePaymentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the StripePayment model
-   */
-  interface StripePaymentFieldRefs {
-    readonly id: FieldRef<"StripePayment", 'String'>
-    readonly clerkUserId: FieldRef<"StripePayment", 'String'>
-    readonly amount: FieldRef<"StripePayment", 'Int'>
-    readonly currency: FieldRef<"StripePayment", 'String'>
-    readonly status: FieldRef<"StripePayment", 'String'>
-    readonly stripePaymentId: FieldRef<"StripePayment", 'String'>
-    readonly metadata: FieldRef<"StripePayment", 'Json'>
-    readonly createdAt: FieldRef<"StripePayment", 'DateTime'>
-    readonly updatedAt: FieldRef<"StripePayment", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * StripePayment findUnique
-   */
-  export type StripePaymentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StripePayment
-     */
-    select?: StripePaymentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StripePayment
-     */
-    omit?: StripePaymentOmit<ExtArgs> | null
-    /**
-     * Filter, which StripePayment to fetch.
-     */
-    where: StripePaymentWhereUniqueInput
-  }
-
-  /**
-   * StripePayment findUniqueOrThrow
-   */
-  export type StripePaymentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StripePayment
-     */
-    select?: StripePaymentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StripePayment
-     */
-    omit?: StripePaymentOmit<ExtArgs> | null
-    /**
-     * Filter, which StripePayment to fetch.
-     */
-    where: StripePaymentWhereUniqueInput
-  }
-
-  /**
-   * StripePayment findFirst
-   */
-  export type StripePaymentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StripePayment
-     */
-    select?: StripePaymentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StripePayment
-     */
-    omit?: StripePaymentOmit<ExtArgs> | null
-    /**
-     * Filter, which StripePayment to fetch.
-     */
-    where?: StripePaymentWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of StripePayments to fetch.
-     */
-    orderBy?: StripePaymentOrderByWithRelationInput | StripePaymentOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for StripePayments.
-     */
-    cursor?: StripePaymentWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` StripePayments from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` StripePayments.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of StripePayments.
-     */
-    distinct?: StripePaymentScalarFieldEnum | StripePaymentScalarFieldEnum[]
-  }
-
-  /**
-   * StripePayment findFirstOrThrow
-   */
-  export type StripePaymentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StripePayment
-     */
-    select?: StripePaymentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StripePayment
-     */
-    omit?: StripePaymentOmit<ExtArgs> | null
-    /**
-     * Filter, which StripePayment to fetch.
-     */
-    where?: StripePaymentWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of StripePayments to fetch.
-     */
-    orderBy?: StripePaymentOrderByWithRelationInput | StripePaymentOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for StripePayments.
-     */
-    cursor?: StripePaymentWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` StripePayments from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` StripePayments.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of StripePayments.
-     */
-    distinct?: StripePaymentScalarFieldEnum | StripePaymentScalarFieldEnum[]
-  }
-
-  /**
-   * StripePayment findMany
-   */
-  export type StripePaymentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StripePayment
-     */
-    select?: StripePaymentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StripePayment
-     */
-    omit?: StripePaymentOmit<ExtArgs> | null
-    /**
-     * Filter, which StripePayments to fetch.
-     */
-    where?: StripePaymentWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of StripePayments to fetch.
-     */
-    orderBy?: StripePaymentOrderByWithRelationInput | StripePaymentOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing StripePayments.
-     */
-    cursor?: StripePaymentWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` StripePayments from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` StripePayments.
-     */
-    skip?: number
-    distinct?: StripePaymentScalarFieldEnum | StripePaymentScalarFieldEnum[]
-  }
-
-  /**
-   * StripePayment create
-   */
-  export type StripePaymentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StripePayment
-     */
-    select?: StripePaymentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StripePayment
-     */
-    omit?: StripePaymentOmit<ExtArgs> | null
-    /**
-     * The data needed to create a StripePayment.
-     */
-    data: XOR<StripePaymentCreateInput, StripePaymentUncheckedCreateInput>
-  }
-
-  /**
-   * StripePayment createMany
-   */
-  export type StripePaymentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many StripePayments.
-     */
-    data: StripePaymentCreateManyInput | StripePaymentCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * StripePayment createManyAndReturn
-   */
-  export type StripePaymentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StripePayment
-     */
-    select?: StripePaymentSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the StripePayment
-     */
-    omit?: StripePaymentOmit<ExtArgs> | null
-    /**
-     * The data used to create many StripePayments.
-     */
-    data: StripePaymentCreateManyInput | StripePaymentCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * StripePayment update
-   */
-  export type StripePaymentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StripePayment
-     */
-    select?: StripePaymentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StripePayment
-     */
-    omit?: StripePaymentOmit<ExtArgs> | null
-    /**
-     * The data needed to update a StripePayment.
-     */
-    data: XOR<StripePaymentUpdateInput, StripePaymentUncheckedUpdateInput>
-    /**
-     * Choose, which StripePayment to update.
-     */
-    where: StripePaymentWhereUniqueInput
-  }
-
-  /**
-   * StripePayment updateMany
-   */
-  export type StripePaymentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update StripePayments.
-     */
-    data: XOR<StripePaymentUpdateManyMutationInput, StripePaymentUncheckedUpdateManyInput>
-    /**
-     * Filter which StripePayments to update
-     */
-    where?: StripePaymentWhereInput
-    /**
-     * Limit how many StripePayments to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * StripePayment updateManyAndReturn
-   */
-  export type StripePaymentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StripePayment
-     */
-    select?: StripePaymentSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the StripePayment
-     */
-    omit?: StripePaymentOmit<ExtArgs> | null
-    /**
-     * The data used to update StripePayments.
-     */
-    data: XOR<StripePaymentUpdateManyMutationInput, StripePaymentUncheckedUpdateManyInput>
-    /**
-     * Filter which StripePayments to update
-     */
-    where?: StripePaymentWhereInput
-    /**
-     * Limit how many StripePayments to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * StripePayment upsert
-   */
-  export type StripePaymentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StripePayment
-     */
-    select?: StripePaymentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StripePayment
-     */
-    omit?: StripePaymentOmit<ExtArgs> | null
-    /**
-     * The filter to search for the StripePayment to update in case it exists.
-     */
-    where: StripePaymentWhereUniqueInput
-    /**
-     * In case the StripePayment found by the `where` argument doesn't exist, create a new StripePayment with this data.
-     */
-    create: XOR<StripePaymentCreateInput, StripePaymentUncheckedCreateInput>
-    /**
-     * In case the StripePayment was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<StripePaymentUpdateInput, StripePaymentUncheckedUpdateInput>
-  }
-
-  /**
-   * StripePayment delete
-   */
-  export type StripePaymentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StripePayment
-     */
-    select?: StripePaymentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StripePayment
-     */
-    omit?: StripePaymentOmit<ExtArgs> | null
-    /**
-     * Filter which StripePayment to delete.
-     */
-    where: StripePaymentWhereUniqueInput
-  }
-
-  /**
-   * StripePayment deleteMany
-   */
-  export type StripePaymentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which StripePayments to delete
-     */
-    where?: StripePaymentWhereInput
-    /**
-     * Limit how many StripePayments to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * StripePayment without action
-   */
-  export type StripePaymentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StripePayment
-     */
-    select?: StripePaymentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StripePayment
-     */
-    omit?: StripePaymentOmit<ExtArgs> | null
-  }
-
-
-  /**
    * Model User
    */
 
@@ -3609,6 +2461,8 @@ export namespace Prisma {
     username: string | null
     primaryEmailAddress: string | null
     imageUrl: string | null
+    stripeCustomerId: string | null
+    accessType: $Enums.AccessType | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3620,6 +2474,8 @@ export namespace Prisma {
     username: string | null
     primaryEmailAddress: string | null
     imageUrl: string | null
+    stripeCustomerId: string | null
+    accessType: $Enums.AccessType | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3632,6 +2488,9 @@ export namespace Prisma {
     primaryEmailAddress: number
     imageUrl: number
     clerkUserProperties: number
+    stripeCustomerId: number
+    accessType: number
+    stripeUserProperties: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -3645,6 +2504,8 @@ export namespace Prisma {
     username?: true
     primaryEmailAddress?: true
     imageUrl?: true
+    stripeCustomerId?: true
+    accessType?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3656,6 +2517,8 @@ export namespace Prisma {
     username?: true
     primaryEmailAddress?: true
     imageUrl?: true
+    stripeCustomerId?: true
+    accessType?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3668,6 +2531,9 @@ export namespace Prisma {
     primaryEmailAddress?: true
     imageUrl?: true
     clerkUserProperties?: true
+    stripeCustomerId?: true
+    accessType?: true
+    stripeUserProperties?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -3753,6 +2619,9 @@ export namespace Prisma {
     primaryEmailAddress: string | null
     imageUrl: string | null
     clerkUserProperties: JsonValue | null
+    stripeCustomerId: string | null
+    accessType: $Enums.AccessType
+    stripeUserProperties: JsonValue | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -3782,6 +2651,9 @@ export namespace Prisma {
     primaryEmailAddress?: boolean
     imageUrl?: boolean
     clerkUserProperties?: boolean
+    stripeCustomerId?: boolean
+    accessType?: boolean
+    stripeUserProperties?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     entries?: boolean | User$entriesArgs<ExtArgs>
@@ -3797,6 +2669,9 @@ export namespace Prisma {
     primaryEmailAddress?: boolean
     imageUrl?: boolean
     clerkUserProperties?: boolean
+    stripeCustomerId?: boolean
+    accessType?: boolean
+    stripeUserProperties?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -3809,6 +2684,9 @@ export namespace Prisma {
     primaryEmailAddress?: boolean
     imageUrl?: boolean
     clerkUserProperties?: boolean
+    stripeCustomerId?: boolean
+    accessType?: boolean
+    stripeUserProperties?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -3821,11 +2699,14 @@ export namespace Prisma {
     primaryEmailAddress?: boolean
     imageUrl?: boolean
     clerkUserProperties?: boolean
+    stripeCustomerId?: boolean
+    accessType?: boolean
+    stripeUserProperties?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "firstName" | "lastName" | "username" | "primaryEmailAddress" | "imageUrl" | "clerkUserProperties" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "firstName" | "lastName" | "username" | "primaryEmailAddress" | "imageUrl" | "clerkUserProperties" | "stripeCustomerId" | "accessType" | "stripeUserProperties" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     entries?: boolean | User$entriesArgs<ExtArgs>
     reflections?: boolean | User$reflectionsArgs<ExtArgs>
@@ -3848,6 +2729,9 @@ export namespace Prisma {
       primaryEmailAddress: string | null
       imageUrl: string | null
       clerkUserProperties: Prisma.JsonValue | null
+      stripeCustomerId: string | null
+      accessType: $Enums.AccessType
+      stripeUserProperties: Prisma.JsonValue | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -4282,6 +3166,9 @@ export namespace Prisma {
     readonly primaryEmailAddress: FieldRef<"User", 'String'>
     readonly imageUrl: FieldRef<"User", 'String'>
     readonly clerkUserProperties: FieldRef<"User", 'Json'>
+    readonly stripeCustomerId: FieldRef<"User", 'String'>
+    readonly accessType: FieldRef<"User", 'AccessType'>
+    readonly stripeUserProperties: FieldRef<"User", 'Json'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -9079,21 +7966,6 @@ export namespace Prisma {
   export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
 
 
-  export const StripePaymentScalarFieldEnum: {
-    id: 'id',
-    clerkUserId: 'clerkUserId',
-    amount: 'amount',
-    currency: 'currency',
-    status: 'status',
-    stripePaymentId: 'stripePaymentId',
-    metadata: 'metadata',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
-  };
-
-  export type StripePaymentScalarFieldEnum = (typeof StripePaymentScalarFieldEnum)[keyof typeof StripePaymentScalarFieldEnum]
-
-
   export const UserScalarFieldEnum: {
     id: 'id',
     firstName: 'firstName',
@@ -9102,6 +7974,9 @@ export namespace Prisma {
     primaryEmailAddress: 'primaryEmailAddress',
     imageUrl: 'imageUrl',
     clerkUserProperties: 'clerkUserProperties',
+    stripeCustomerId: 'stripeCustomerId',
+    accessType: 'accessType',
+    stripeUserProperties: 'stripeUserProperties',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -9228,20 +8103,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -9252,6 +8113,34 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'AccessType'
+   */
+  export type EnumAccessTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccessType'>
+    
+
+
+  /**
+   * Reference to a field of type 'AccessType[]'
+   */
+  export type ListEnumAccessTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccessType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -9324,80 +8213,6 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Post"> | Date | string
   }
 
-  export type StripePaymentWhereInput = {
-    AND?: StripePaymentWhereInput | StripePaymentWhereInput[]
-    OR?: StripePaymentWhereInput[]
-    NOT?: StripePaymentWhereInput | StripePaymentWhereInput[]
-    id?: StringFilter<"StripePayment"> | string
-    clerkUserId?: StringFilter<"StripePayment"> | string
-    amount?: IntFilter<"StripePayment"> | number
-    currency?: StringFilter<"StripePayment"> | string
-    status?: StringFilter<"StripePayment"> | string
-    stripePaymentId?: StringFilter<"StripePayment"> | string
-    metadata?: JsonNullableFilter<"StripePayment">
-    createdAt?: DateTimeFilter<"StripePayment"> | Date | string
-    updatedAt?: DateTimeFilter<"StripePayment"> | Date | string
-  }
-
-  export type StripePaymentOrderByWithRelationInput = {
-    id?: SortOrder
-    clerkUserId?: SortOrder
-    amount?: SortOrder
-    currency?: SortOrder
-    status?: SortOrder
-    stripePaymentId?: SortOrder
-    metadata?: SortOrderInput | SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type StripePaymentWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    stripePaymentId?: string
-    AND?: StripePaymentWhereInput | StripePaymentWhereInput[]
-    OR?: StripePaymentWhereInput[]
-    NOT?: StripePaymentWhereInput | StripePaymentWhereInput[]
-    clerkUserId?: StringFilter<"StripePayment"> | string
-    amount?: IntFilter<"StripePayment"> | number
-    currency?: StringFilter<"StripePayment"> | string
-    status?: StringFilter<"StripePayment"> | string
-    metadata?: JsonNullableFilter<"StripePayment">
-    createdAt?: DateTimeFilter<"StripePayment"> | Date | string
-    updatedAt?: DateTimeFilter<"StripePayment"> | Date | string
-  }, "id" | "stripePaymentId">
-
-  export type StripePaymentOrderByWithAggregationInput = {
-    id?: SortOrder
-    clerkUserId?: SortOrder
-    amount?: SortOrder
-    currency?: SortOrder
-    status?: SortOrder
-    stripePaymentId?: SortOrder
-    metadata?: SortOrderInput | SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    _count?: StripePaymentCountOrderByAggregateInput
-    _avg?: StripePaymentAvgOrderByAggregateInput
-    _max?: StripePaymentMaxOrderByAggregateInput
-    _min?: StripePaymentMinOrderByAggregateInput
-    _sum?: StripePaymentSumOrderByAggregateInput
-  }
-
-  export type StripePaymentScalarWhereWithAggregatesInput = {
-    AND?: StripePaymentScalarWhereWithAggregatesInput | StripePaymentScalarWhereWithAggregatesInput[]
-    OR?: StripePaymentScalarWhereWithAggregatesInput[]
-    NOT?: StripePaymentScalarWhereWithAggregatesInput | StripePaymentScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"StripePayment"> | string
-    clerkUserId?: StringWithAggregatesFilter<"StripePayment"> | string
-    amount?: IntWithAggregatesFilter<"StripePayment"> | number
-    currency?: StringWithAggregatesFilter<"StripePayment"> | string
-    status?: StringWithAggregatesFilter<"StripePayment"> | string
-    stripePaymentId?: StringWithAggregatesFilter<"StripePayment"> | string
-    metadata?: JsonNullableWithAggregatesFilter<"StripePayment">
-    createdAt?: DateTimeWithAggregatesFilter<"StripePayment"> | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter<"StripePayment"> | Date | string
-  }
-
   export type UserWhereInput = {
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
@@ -9409,6 +8224,9 @@ export namespace Prisma {
     primaryEmailAddress?: StringNullableFilter<"User"> | string | null
     imageUrl?: StringNullableFilter<"User"> | string | null
     clerkUserProperties?: JsonNullableFilter<"User">
+    stripeCustomerId?: StringNullableFilter<"User"> | string | null
+    accessType?: EnumAccessTypeFilter<"User"> | $Enums.AccessType
+    stripeUserProperties?: JsonNullableFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     entries?: FounderLogEntryListRelationFilter
@@ -9423,6 +8241,9 @@ export namespace Prisma {
     primaryEmailAddress?: SortOrderInput | SortOrder
     imageUrl?: SortOrderInput | SortOrder
     clerkUserProperties?: SortOrderInput | SortOrder
+    stripeCustomerId?: SortOrderInput | SortOrder
+    accessType?: SortOrder
+    stripeUserProperties?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     entries?: FounderLogEntryOrderByRelationAggregateInput
@@ -9433,6 +8254,7 @@ export namespace Prisma {
     id?: string
     username?: string
     primaryEmailAddress?: string
+    stripeCustomerId?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
@@ -9440,11 +8262,13 @@ export namespace Prisma {
     lastName?: StringNullableFilter<"User"> | string | null
     imageUrl?: StringNullableFilter<"User"> | string | null
     clerkUserProperties?: JsonNullableFilter<"User">
+    accessType?: EnumAccessTypeFilter<"User"> | $Enums.AccessType
+    stripeUserProperties?: JsonNullableFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     entries?: FounderLogEntryListRelationFilter
     reflections?: FounderLogReflectionListRelationFilter
-  }, "id" | "username" | "primaryEmailAddress">
+  }, "id" | "username" | "primaryEmailAddress" | "stripeCustomerId">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
@@ -9454,6 +8278,9 @@ export namespace Prisma {
     primaryEmailAddress?: SortOrderInput | SortOrder
     imageUrl?: SortOrderInput | SortOrder
     clerkUserProperties?: SortOrderInput | SortOrder
+    stripeCustomerId?: SortOrderInput | SortOrder
+    accessType?: SortOrder
+    stripeUserProperties?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -9472,6 +8299,9 @@ export namespace Prisma {
     primaryEmailAddress?: StringNullableWithAggregatesFilter<"User"> | string | null
     imageUrl?: StringNullableWithAggregatesFilter<"User"> | string | null
     clerkUserProperties?: JsonNullableWithAggregatesFilter<"User">
+    stripeCustomerId?: StringNullableWithAggregatesFilter<"User"> | string | null
+    accessType?: EnumAccessTypeWithAggregatesFilter<"User"> | $Enums.AccessType
+    stripeUserProperties?: JsonNullableWithAggregatesFilter<"User">
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -9761,90 +8591,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StripePaymentCreateInput = {
-    id?: string
-    clerkUserId: string
-    amount: number
-    currency?: string
-    status: string
-    stripePaymentId: string
-    metadata?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type StripePaymentUncheckedCreateInput = {
-    id?: string
-    clerkUserId: string
-    amount: number
-    currency?: string
-    status: string
-    stripePaymentId: string
-    metadata?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type StripePaymentUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clerkUserId?: StringFieldUpdateOperationsInput | string
-    amount?: IntFieldUpdateOperationsInput | number
-    currency?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
-    stripePaymentId?: StringFieldUpdateOperationsInput | string
-    metadata?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StripePaymentUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clerkUserId?: StringFieldUpdateOperationsInput | string
-    amount?: IntFieldUpdateOperationsInput | number
-    currency?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
-    stripePaymentId?: StringFieldUpdateOperationsInput | string
-    metadata?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StripePaymentCreateManyInput = {
-    id?: string
-    clerkUserId: string
-    amount: number
-    currency?: string
-    status: string
-    stripePaymentId: string
-    metadata?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type StripePaymentUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clerkUserId?: StringFieldUpdateOperationsInput | string
-    amount?: IntFieldUpdateOperationsInput | number
-    currency?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
-    stripePaymentId?: StringFieldUpdateOperationsInput | string
-    metadata?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StripePaymentUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clerkUserId?: StringFieldUpdateOperationsInput | string
-    amount?: IntFieldUpdateOperationsInput | number
-    currency?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
-    stripePaymentId?: StringFieldUpdateOperationsInput | string
-    metadata?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
   export type UserCreateInput = {
     id: string
     firstName?: string | null
@@ -9853,6 +8599,9 @@ export namespace Prisma {
     primaryEmailAddress?: string | null
     imageUrl?: string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: string | null
+    accessType?: $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     entries?: FounderLogEntryCreateNestedManyWithoutUserInput
@@ -9867,6 +8616,9 @@ export namespace Prisma {
     primaryEmailAddress?: string | null
     imageUrl?: string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: string | null
+    accessType?: $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     entries?: FounderLogEntryUncheckedCreateNestedManyWithoutUserInput
@@ -9881,6 +8633,9 @@ export namespace Prisma {
     primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    accessType?: EnumAccessTypeFieldUpdateOperationsInput | $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     entries?: FounderLogEntryUpdateManyWithoutUserNestedInput
@@ -9895,6 +8650,9 @@ export namespace Prisma {
     primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    accessType?: EnumAccessTypeFieldUpdateOperationsInput | $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     entries?: FounderLogEntryUncheckedUpdateManyWithoutUserNestedInput
@@ -9909,6 +8667,9 @@ export namespace Prisma {
     primaryEmailAddress?: string | null
     imageUrl?: string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: string | null
+    accessType?: $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9921,6 +8682,9 @@ export namespace Prisma {
     primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    accessType?: EnumAccessTypeFieldUpdateOperationsInput | $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9933,6 +8697,9 @@ export namespace Prisma {
     primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    accessType?: EnumAccessTypeFieldUpdateOperationsInput | $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10247,15 +9014,19 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -10281,67 +9052,95 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type EnumAccessTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.AccessType | EnumAccessTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AccessType[] | ListEnumAccessTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AccessType[] | ListEnumAccessTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAccessTypeFilter<$PrismaModel> | $Enums.AccessType
+  }
+
+  export type FounderLogEntryListRelationFilter = {
+    every?: FounderLogEntryWhereInput
+    some?: FounderLogEntryWhereInput
+    none?: FounderLogEntryWhereInput
+  }
+
+  export type FounderLogReflectionListRelationFilter = {
+    every?: FounderLogReflectionWhereInput
+    some?: FounderLogReflectionWhereInput
+    none?: FounderLogReflectionWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
   }
 
-  export type StripePaymentCountOrderByAggregateInput = {
+  export type FounderLogEntryOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FounderLogReflectionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type UserCountOrderByAggregateInput = {
     id?: SortOrder
-    clerkUserId?: SortOrder
-    amount?: SortOrder
-    currency?: SortOrder
-    status?: SortOrder
-    stripePaymentId?: SortOrder
-    metadata?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    username?: SortOrder
+    primaryEmailAddress?: SortOrder
+    imageUrl?: SortOrder
+    clerkUserProperties?: SortOrder
+    stripeCustomerId?: SortOrder
+    accessType?: SortOrder
+    stripeUserProperties?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
-  export type StripePaymentAvgOrderByAggregateInput = {
-    amount?: SortOrder
-  }
-
-  export type StripePaymentMaxOrderByAggregateInput = {
+  export type UserMaxOrderByAggregateInput = {
     id?: SortOrder
-    clerkUserId?: SortOrder
-    amount?: SortOrder
-    currency?: SortOrder
-    status?: SortOrder
-    stripePaymentId?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    username?: SortOrder
+    primaryEmailAddress?: SortOrder
+    imageUrl?: SortOrder
+    stripeCustomerId?: SortOrder
+    accessType?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
-  export type StripePaymentMinOrderByAggregateInput = {
+  export type UserMinOrderByAggregateInput = {
     id?: SortOrder
-    clerkUserId?: SortOrder
-    amount?: SortOrder
-    currency?: SortOrder
-    status?: SortOrder
-    stripePaymentId?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    username?: SortOrder
+    primaryEmailAddress?: SortOrder
+    imageUrl?: SortOrder
+    stripeCustomerId?: SortOrder
+    accessType?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
-  export type StripePaymentSumOrderByAggregateInput = {
-    amount?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
   export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -10370,91 +9169,14 @@ export namespace Prisma {
     _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type FounderLogEntryListRelationFilter = {
-    every?: FounderLogEntryWhereInput
-    some?: FounderLogEntryWhereInput
-    none?: FounderLogEntryWhereInput
-  }
-
-  export type FounderLogReflectionListRelationFilter = {
-    every?: FounderLogReflectionWhereInput
-    some?: FounderLogReflectionWhereInput
-    none?: FounderLogReflectionWhereInput
-  }
-
-  export type FounderLogEntryOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type FounderLogReflectionOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type UserCountOrderByAggregateInput = {
-    id?: SortOrder
-    firstName?: SortOrder
-    lastName?: SortOrder
-    username?: SortOrder
-    primaryEmailAddress?: SortOrder
-    imageUrl?: SortOrder
-    clerkUserProperties?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type UserMaxOrderByAggregateInput = {
-    id?: SortOrder
-    firstName?: SortOrder
-    lastName?: SortOrder
-    username?: SortOrder
-    primaryEmailAddress?: SortOrder
-    imageUrl?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type UserMinOrderByAggregateInput = {
-    id?: SortOrder
-    firstName?: SortOrder
-    lastName?: SortOrder
-    username?: SortOrder
-    primaryEmailAddress?: SortOrder
-    imageUrl?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
+  export type EnumAccessTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AccessType | EnumAccessTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AccessType[] | ListEnumAccessTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AccessType[] | ListEnumAccessTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAccessTypeWithAggregatesFilter<$PrismaModel> | $Enums.AccessType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAccessTypeFilter<$PrismaModel>
+    _max?: NestedEnumAccessTypeFilter<$PrismaModel>
   }
 
   export type FounderLogEntryTagListRelationFilter = {
@@ -10486,6 +9208,17 @@ export namespace Prisma {
     name?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type UserScalarRelationFilter = {
@@ -10526,6 +9259,22 @@ export namespace Prisma {
 
   export type FounderLogEntrySumOrderByAggregateInput = {
     upvoteCount?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type FounderLogEntryScalarRelationFilter = {
@@ -10599,14 +9348,6 @@ export namespace Prisma {
     set?: Date | string
   }
 
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
   export type FounderLogEntryCreateNestedManyWithoutUserInput = {
     create?: XOR<FounderLogEntryCreateWithoutUserInput, FounderLogEntryUncheckedCreateWithoutUserInput> | FounderLogEntryCreateWithoutUserInput[] | FounderLogEntryUncheckedCreateWithoutUserInput[]
     connectOrCreate?: FounderLogEntryCreateOrConnectWithoutUserInput | FounderLogEntryCreateOrConnectWithoutUserInput[]
@@ -10637,6 +9378,10 @@ export namespace Prisma {
 
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
+  }
+
+  export type EnumAccessTypeFieldUpdateOperationsInput = {
+    set?: $Enums.AccessType
   }
 
   export type FounderLogEntryUpdateManyWithoutUserNestedInput = {
@@ -10755,6 +9500,14 @@ export namespace Prisma {
     connectOrCreate?: FounderLogEntryTagCreateOrConnectWithoutEntryInput | FounderLogEntryTagCreateOrConnectWithoutEntryInput[]
     createMany?: FounderLogEntryTagCreateManyEntryInputEnvelope
     connect?: FounderLogEntryTagWhereUniqueInput | FounderLogEntryTagWhereUniqueInput[]
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type UserUpdateOneRequiredWithoutEntriesNestedInput = {
@@ -10902,31 +9655,42 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
+  export type NestedEnumAccessTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.AccessType | EnumAccessTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AccessType[] | ListEnumAccessTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AccessType[] | ListEnumAccessTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAccessTypeFilter<$PrismaModel> | $Enums.AccessType
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type NestedIntNullableFilter<$PrismaModel = never> = {
@@ -10963,35 +9727,41 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  export type NestedEnumAccessTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AccessType | EnumAccessTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AccessType[] | ListEnumAccessTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AccessType[] | ListEnumAccessTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAccessTypeWithAggregatesFilter<$PrismaModel> | $Enums.AccessType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAccessTypeFilter<$PrismaModel>
+    _max?: NestedEnumAccessTypeFilter<$PrismaModel>
   }
 
-  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
   }
 
   export type FounderLogEntryCreateWithoutUserInput = {
@@ -11160,6 +9930,9 @@ export namespace Prisma {
     primaryEmailAddress?: string | null
     imageUrl?: string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: string | null
+    accessType?: $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     reflections?: FounderLogReflectionCreateNestedManyWithoutUserInput
@@ -11173,6 +9946,9 @@ export namespace Prisma {
     primaryEmailAddress?: string | null
     imageUrl?: string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: string | null
+    accessType?: $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     reflections?: FounderLogReflectionUncheckedCreateNestedManyWithoutUserInput
@@ -11224,6 +10000,9 @@ export namespace Prisma {
     primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    accessType?: EnumAccessTypeFieldUpdateOperationsInput | $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reflections?: FounderLogReflectionUpdateManyWithoutUserNestedInput
@@ -11237,6 +10016,9 @@ export namespace Prisma {
     primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    accessType?: EnumAccessTypeFieldUpdateOperationsInput | $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reflections?: FounderLogReflectionUncheckedUpdateManyWithoutUserNestedInput
@@ -11362,6 +10144,9 @@ export namespace Prisma {
     primaryEmailAddress?: string | null
     imageUrl?: string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: string | null
+    accessType?: $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     entries?: FounderLogEntryCreateNestedManyWithoutUserInput
@@ -11375,6 +10160,9 @@ export namespace Prisma {
     primaryEmailAddress?: string | null
     imageUrl?: string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: string | null
+    accessType?: $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     entries?: FounderLogEntryUncheckedCreateNestedManyWithoutUserInput
@@ -11404,6 +10192,9 @@ export namespace Prisma {
     primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    accessType?: EnumAccessTypeFieldUpdateOperationsInput | $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     entries?: FounderLogEntryUpdateManyWithoutUserNestedInput
@@ -11417,6 +10208,9 @@ export namespace Prisma {
     primaryEmailAddress?: NullableStringFieldUpdateOperationsInput | string | null
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     clerkUserProperties?: NullableJsonNullValueInput | InputJsonValue
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    accessType?: EnumAccessTypeFieldUpdateOperationsInput | $Enums.AccessType
+    stripeUserProperties?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     entries?: FounderLogEntryUncheckedUpdateManyWithoutUserNestedInput

@@ -1,12 +1,12 @@
 import { createTRPCRouter } from "../trpc";
-import { founderlogRouter } from "./founderlog";
 import { postRouter } from "./post";
+import { remotionRouter } from "./remotion";
 import { stripeRouter } from "./stripe";
 
 export const appRouter = createTRPCRouter({
   post: postRouter,
   stripe: stripeRouter,
-  founderlog: founderlogRouter,
+  remotion: remotionRouter,
 });
 
 // export type definition of API

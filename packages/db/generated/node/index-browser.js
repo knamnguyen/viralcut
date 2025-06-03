@@ -128,18 +128,6 @@ exports.Prisma.PostScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.StripePaymentScalarFieldEnum = {
-  id: 'id',
-  clerkUserId: 'clerkUserId',
-  amount: 'amount',
-  currency: 'currency',
-  status: 'status',
-  stripePaymentId: 'stripePaymentId',
-  metadata: 'metadata',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   firstName: 'firstName',
@@ -148,6 +136,9 @@ exports.Prisma.UserScalarFieldEnum = {
   primaryEmailAddress: 'primaryEmailAddress',
   imageUrl: 'imageUrl',
   clerkUserProperties: 'clerkUserProperties',
+  stripeCustomerId: 'stripeCustomerId',
+  accessType: 'accessType',
+  stripeUserProperties: 'stripeUserProperties',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -209,11 +200,16 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
-
+exports.AccessType = exports.$Enums.AccessType = {
+  TRIAL: 'TRIAL',
+  FREE: 'FREE',
+  LIFETIME: 'LIFETIME',
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY'
+};
 
 exports.Prisma.ModelName = {
   Post: 'Post',
-  StripePayment: 'StripePayment',
   User: 'User',
   FounderLogTag: 'FounderLogTag',
   FounderLogEntry: 'FounderLogEntry',
