@@ -32,7 +32,7 @@
     "@sassy/eslint-config": "workspace:*",
     "@sassy/prettier-config": "workspace:*",
     "@sassy/tsconfig": "workspace:*",
-    "@types/node": "^22.15.21",
+    "@types/node": "^22.10.10",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
     "dotenv-cli": "^8.0.0",

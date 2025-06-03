@@ -11,9 +11,9 @@ interface HelloWorldProps {
   text?: string;
 }
 
-export const HelloWorld: React.FC<HelloWorldProps> = ({
+export const HelloWorld = ({
   text = "Hello World!",
-}) => {
+}: HelloWorldProps) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
