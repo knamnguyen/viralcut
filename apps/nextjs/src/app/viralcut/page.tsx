@@ -13,19 +13,22 @@ import { useState } from "react";
 import { DropzoneOptions } from "react-dropzone";
 import { useTRPC } from "~/trpc/react";
 import { toast } from "sonner";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
  
 const FileUploadDropzone = () => {
   const [files, setFiles] = useState<File[] | null>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
+  const [uploadedVideoId, setUploadedVideoId] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "completed" | "failed">("idle");
+  const [speedMultiplier, setSpeedMultiplier] = useState(0.5);
+  const [processingStatus, setProcessingStatus] = useState<"idle" | "processing" | "completed" | "failed">("idle");
+  const [renderId, setRenderId] = useState<string | null>(null);
 
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  // tRPC mutations following the posts.tsx pattern
+  // tRPC mutations
   const getUploadUrl = useMutation(
     trpc.video.getUploadUrl.mutationOptions({
       onError: (err: any) => {
@@ -44,6 +47,63 @@ const FileUploadDropzone = () => {
       },
     })
   );
+
+  const adjustVideoSpeed = useMutation(
+    trpc.video.adjustVideoSpeed.mutationOptions({
+      onSuccess: (data) => {
+        setRenderId(data.renderId);
+        setProcessingStatus("processing");
+        toast.success("Video processing started!");
+      },
+      onError: (err: any) => {
+        console.error("Failed to start video processing:", err.message);
+        toast.error("Failed to start video processing");
+        setProcessingStatus("failed");
+      },
+    })
+  );
+
+  // Query for processing progress
+  const { data: progress } = useQuery({
+    ...trpc.video.getProcessingProgress.queryOptions({
+      videoId: uploadedVideoId || "",
+    }),
+    enabled: Boolean(uploadedVideoId && processingStatus === "processing"),
+    refetchInterval: (data: any) => {
+      return processingStatus === "processing" && !data?.done ? 10000 : false;
+    },
+  });
+
+  // Query for processed video URL
+  const { data: processedVideoData, error: processedVideoError, isLoading: processedVideoLoading } = useQuery({
+    ...trpc.video.getProcessedVideoUrl.queryOptions({
+      videoId: uploadedVideoId || "",
+    }),
+    enabled: Boolean(uploadedVideoId && processingStatus === "completed"),
+  });
+
+  // Update processing status based on progress
+  if (progress?.done && processingStatus === "processing") {
+    if (progress.fatalErrorEncountered) {
+      setProcessingStatus("failed");
+    } else {
+      setProcessingStatus("completed");
+      // Invalidate all video queries to ensure fresh data
+      queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === 'video'
+      });
+    }
+  }
+
+  // Debug logging for processed video data
+  console.log("Frontend Debug:", {
+    uploadedVideoId,
+    processingStatus,
+    processedVideoData,
+    processedVideoError,
+    processedVideoLoading,
+    queryEnabled: Boolean(uploadedVideoId && processingStatus === "completed")
+  });
  
   const dropzone = {
     accept: {
@@ -127,10 +187,7 @@ const FileUploadDropzone = () => {
       });
 
       setUploadProgress(100);
-      
-      // Create the S3 URL for the uploaded video
-      const videoUrl = `https://${uploadData.bucket}.s3.amazonaws.com/${uploadData.key}`;
-      setUploadedVideoUrl(videoUrl);
+      setUploadedVideoId(videoId);
       setUploadStatus("completed");
       
       toast.success("Video uploaded successfully!");
@@ -142,6 +199,18 @@ const FileUploadDropzone = () => {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleAdjustSpeed = async () => {
+    if (!uploadedVideoId) {
+      toast.error("No video available for processing");
+      return;
+    }
+
+    await adjustVideoSpeed.mutateAsync({
+      videoId: uploadedVideoId,
+      speedMultiplier,
+    });
   };
 
   const getVideoDuration = (file: File): Promise<number> => {
@@ -163,12 +232,14 @@ const FileUploadDropzone = () => {
 
   const resetUpload = () => {
     setFiles([]);
-    setUploadedVideoUrl(null);
+    setUploadedVideoId(null);
     setUploadStatus("idle");
     setUploadProgress(0);
+    setProcessingStatus("idle");
+    setRenderId(null);
   };
 
-  const getStatusMessage = () => {
+  const getUploadStatusMessage = () => {
     switch (uploadStatus) {
       case "uploading":
         return "Uploading video to cloud storage...";
@@ -180,13 +251,26 @@ const FileUploadDropzone = () => {
         return "";
     }
   };
+
+  const getProcessingStatusMessage = () => {
+    switch (processingStatus) {
+      case "processing":
+        return `Processing video with ${speedMultiplier}x speed...`;
+      case "completed":
+        return "Video processing completed!";
+      case "failed":
+        return "Processing failed. Please try again.";
+      default:
+        return "";
+    }
+  };
  
   return (
     <div className="p-6 max-w-2xl mx-auto space-y-6">
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold">Video Upload to S3</h1>
+        <h1 className="text-2xl font-bold">Video Speed Adjustment</h1>
         <p className="text-gray-600">
-          Upload a video (max 2GB, 5 minutes) to cloud storage and get back the URL
+          Upload a video (max 2GB, 5 minutes) and adjust its playback speed using AI processing
         </p>
       </div>
 
@@ -232,7 +316,7 @@ const FileUploadDropzone = () => {
             disabled={isUploading}
             className="w-full"
           >
-            Upload Video to S3
+            Upload Video
           </Button>
         </div>
       )}
@@ -241,7 +325,7 @@ const FileUploadDropzone = () => {
         <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded">
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>{getStatusMessage()}</span>
+              <span>{getUploadStatusMessage()}</span>
               <span>{Math.round(uploadProgress)}%</span>
             </div>
             <Progress value={uploadProgress} className="w-full" />
@@ -249,53 +333,127 @@ const FileUploadDropzone = () => {
         </div>
       )}
 
-      {uploadStatus === "completed" && uploadedVideoUrl && (
+      {uploadStatus === "completed" && processingStatus === "idle" && (
         <div className="space-y-4 p-4 bg-green-50 border border-green-200 rounded">
           <h3 className="text-lg font-semibold text-green-800">
             Video Uploaded Successfully!
           </h3>
           <div className="space-y-4">
             <div className="space-y-2">
-              <p className="text-sm text-green-700 font-medium">Uploaded Video URL:</p>
-              <div className="p-2 bg-white rounded border text-sm font-mono break-all">
-                {uploadedVideoUrl}
-              </div>
-              <Button 
-                onClick={() => navigator.clipboard.writeText(uploadedVideoUrl)}
-                variant="outline"
-                size="sm"
-              >
-                Copy URL
-              </Button>
-            </div>
-            
-            <div className="space-y-2">
-              <p className="text-sm text-green-700 font-medium">Preview from S3:</p>
-              <video
-                src={uploadedVideoUrl}
-                controls
-                className="w-full h-40 rounded border"
-                preload="metadata"
+              <label className="text-sm font-medium text-green-700">
+                Speed Multiplier: {speedMultiplier}x
+              </label>
+              <input
+                type="range"
+                min="0.1"
+                max="3"
+                step="0.1"
+                value={speedMultiplier}
+                onChange={(e) => setSpeedMultiplier(parseFloat(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
               />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>0.1x (Very Slow)</span>
+                <span>1x (Normal)</span>
+                <span>3x (Fast)</span>
+              </div>
             </div>
             
-            <div className="flex gap-2">
-              <Button onClick={resetUpload} variant="outline" className="w-full">
-                Upload Another Video
-              </Button>
-            </div>
+            <Button 
+              onClick={handleAdjustSpeed}
+              disabled={adjustVideoSpeed.isPending}
+              className="w-full"
+            >
+              {adjustVideoSpeed.isPending ? "Starting Processing..." : "Adjust Video Speed"}
+            </Button>
+            
+            <Button onClick={resetUpload} variant="outline" className="w-full">
+              Upload Another Video
+            </Button>
           </div>
         </div>
       )}
 
-      {uploadStatus === "failed" && (
+      {processingStatus === "processing" && (
+        <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded">
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>{getProcessingStatusMessage()}</span>
+              <span>{progress ? Math.round(progress.progress * 100) : 0}%</span>
+            </div>
+            <Progress value={progress ? progress.progress * 100 : 0} className="w-full" />
+          </div>
+          <p className="text-sm text-blue-700">
+            This may take a few minutes depending on video length...
+          </p>
+        </div>
+      )}
+
+      {processingStatus === "completed" && (
+        <div className="space-y-4 p-4 bg-green-50 border border-green-200 rounded">
+          <h3 className="text-lg font-semibold text-green-800">
+            Video Processing Complete!
+          </h3>
+          
+          {processedVideoLoading && (
+            <p className="text-sm text-blue-700">Loading processed video...</p>
+          )}
+          
+          {processedVideoError && (
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
+              <p className="text-sm text-yellow-800">
+                Error loading video: {processedVideoError.message}
+              </p>
+            </div>
+          )}
+          
+          {processedVideoData && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <p className="text-sm text-green-700 font-medium">Processed Video Preview:</p>
+                <video
+                  src={processedVideoData.videoUrl}
+                  controls
+                  className="w-full h-60 rounded border"
+                  preload="metadata"
+                />
+              </div>
+              
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => window.open(processedVideoData.downloadUrl, '_blank')}
+                  className="flex-1"
+                >
+                  Download Video
+                </Button>
+                <Button onClick={resetUpload} variant="outline" className="flex-1">
+                  Process Another Video
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          {!processedVideoData && !processedVideoLoading && !processedVideoError && (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600">
+                Video URL not available yet. This may take a moment...
+              </p>
+              <Button onClick={resetUpload} variant="outline" className="w-full">
+                Try Processing Another Video
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {(uploadStatus === "failed" || processingStatus === "failed") && (
         <div className="space-y-4 p-4 bg-red-50 border border-red-200 rounded">
           <h3 className="text-lg font-semibold text-red-800">
-            Upload Failed
+            {uploadStatus === "failed" ? "Upload Failed" : "Processing Failed"}
           </h3>
           <div className="space-y-2">
             <p className="text-sm text-red-700">
-              Something went wrong during video upload. Please try again.
+              Something went wrong. Please try again.
             </p>
             <Button onClick={resetUpload} variant="outline" className="w-full">
               Try Again
