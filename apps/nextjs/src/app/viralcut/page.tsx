@@ -29,8 +29,8 @@ const FileUploadDropzone = () => {
   const getUploadUrl = useMutation(
     trpc.video.getUploadUrl.mutationOptions({
       onError: (err: any) => {
+        console.error("Failed to get upload URL:", err.message);
         toast.error("Failed to get upload URL");
-        console.error(err);
         setUploadStatus("failed");
       },
     })
@@ -39,12 +39,12 @@ const FileUploadDropzone = () => {
   const saveMetadata = useMutation(
     trpc.video.saveMetadata.mutationOptions({
       onError: (err: any) => {
+        console.error("Failed to save video metadata:", err.message);
         toast.error("Failed to save video metadata");
-        console.error(err);
       },
     })
   );
-
+ 
   const dropzone = {
     accept: {
       "video/*": [".mp4", ".mov", ".avi", ".mkv", ".webm"],
@@ -63,6 +63,11 @@ const FileUploadDropzone = () => {
           "Content-Type": file.type,
         },
       });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("S3 Upload failed:", { status: response.status, error: errorText });
+      }
 
       return response.ok;
     } catch (error) {
@@ -175,7 +180,7 @@ const FileUploadDropzone = () => {
         return "";
     }
   };
-
+ 
   return (
     <div className="p-6 max-w-2xl mx-auto space-y-6">
       <div className="space-y-4">
@@ -185,40 +190,40 @@ const FileUploadDropzone = () => {
         </p>
       </div>
 
-      <FileUploader
-        value={files}
-        onValueChange={setFiles}
-        dropzoneOptions={dropzone}
-      >
-        <FileInput>
-          <div className="flex items-center justify-center h-32 w-full border bg-background rounded-md">
+    <FileUploader
+      value={files}
+      onValueChange={setFiles}
+      dropzoneOptions={dropzone}
+    >
+      <FileInput>
+        <div className="flex items-center justify-center h-32 w-full border bg-background rounded-md">
             <p className="text-gray-400">Drop video files here</p>
-          </div>
-        </FileInput>
-        <FileUploaderContent className="flex items-center flex-row gap-2">
-          {files?.map((file, i) => (
-            <FileUploaderItem
-              key={i}
-              index={i}
+        </div>
+      </FileInput>
+      <FileUploaderContent className="flex items-center flex-row gap-2">
+        {files?.map((file, i) => (
+          <FileUploaderItem
+            key={i}
+            index={i}
               className="w-full p-4 rounded-md overflow-hidden border"
-              aria-roledescription={`file ${i + 1} containing ${file.name}`}
-            >
+            aria-roledescription={`file ${i + 1} containing ${file.name}`}
+          >
               <div className="space-y-2">
                 <video
-                  src={URL.createObjectURL(file)}
+              src={URL.createObjectURL(file)}
                   controls
                   className="w-full h-40 rounded"
                   preload="metadata"
-                />
+            />
                 <div className="text-sm text-gray-600">
                   <p>File: {file.name}</p>
                   <p>Size: {(file.size / 1024 / 1024).toFixed(1)} MB</p>
                 </div>
               </div>
-            </FileUploaderItem>
-          ))}
-        </FileUploaderContent>
-      </FileUploader>
+          </FileUploaderItem>
+        ))}
+      </FileUploaderContent>
+    </FileUploader>
 
       {files && files.length > 0 && uploadStatus === "idle" && (
         <div className="space-y-4">

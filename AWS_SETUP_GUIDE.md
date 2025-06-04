@@ -14,8 +14,28 @@ After following this guide, you'll have:
 AWS_REGION=us-west-2
 AWS_ACCESS_KEY_ID=AKIA...
 AWS_SECRET_ACCESS_KEY=...
-S3_BUCKET=viralcut-[your-suffix]
+S3_BUCKET=viralcut-s3bucket
 ```
+
+## Multi-App AWS Resource Naming Convention
+
+This guide uses a scalable naming convention that allows you to manage multiple apps in the same AWS account:
+
+**Pattern**: `{app-name}-{service-type}-{environment?}`
+
+### For ViralCut:
+- **IAM User**: `viralcut-user`
+- **Main S3 Bucket**: `viralcut-s3bucket` 
+- **Remotion S3**: `remotionlambda-viralcut` (follows Remotion's required pattern)
+- **Lambda Functions**: `remotion-render-viralcut` (auto-created by Remotion)
+
+### For Future Apps:
+- **IAM User**: `otherapp-user`
+- **Main S3 Bucket**: `otherapp-bucket`
+- **Remotion S3**: `remotionlambda-otherapp`
+- **Lambda Functions**: `remotion-render-otherapp`
+
+> **Note**: Remotion requires specific naming patterns for Lambda functions (`remotion-render-*`) and S3 buckets (`remotionlambda-*`). You can customize the suffix to match your app name.
 
 ## Prerequisites
 - AWS Account (create at https://aws.amazon.com/)
@@ -33,7 +53,7 @@ S3_BUCKET=viralcut-[your-suffix]
 
 3. **Create Single Bucket**
    - Click "Create bucket"
-   - **Bucket name**: `viralcut-[your-unique-suffix]` (must be globally unique)
+   - **Bucket name**: `viralcut-s3bucket` (S3 bucket names must be globally unique, so add a suffix if this name is taken)
    - **AWS Region**: Choose closest to your users (e.g., `us-west-2`)
    - **Object Ownership**: Keep "ACLs disabled" (recommended)
    - **Block all public access**: Keep checked (we'll use presigned URLs)
@@ -77,11 +97,15 @@ S3_BUCKET=viralcut-[your-suffix]
                 "s3:DeleteObject",
                 "s3:ListBucket",
                 "s3:GetObjectAcl",
-                "s3:PutObjectAcl"
+                "s3:PutObjectAcl",
+                "s3:CreateBucket",
+                "s3:PutBucketAcl",
+                "s3:PutBucketOwnershipControls",
+                "s3:PutBucketPublicAccessBlock"
             ],
             "Resource": [
-                "arn:aws:s3:::viralcut-[your-suffix]",
-                "arn:aws:s3:::viralcut-[your-suffix]/*"
+                "arn:aws:s3:::viralcut-s3bucket",
+                "arn:aws:s3:::viralcut-s3bucket/*"
             ]
         },
         {
@@ -102,8 +126,8 @@ S3_BUCKET=viralcut-[your-suffix]
                 "s3:PutLifecycleConfiguration"
             ],
             "Resource": [
-                "arn:aws:s3:::remotionlambda-*",
-                "arn:aws:s3:::remotionlambda-*/*"
+                "arn:aws:s3:::remotionlambda-viralcut",
+                "arn:aws:s3:::remotionlambda-viralcut/*"
             ]
         },
         {
@@ -121,7 +145,7 @@ S3_BUCKET=viralcut-[your-suffix]
                 "lambda:GetFunction"
             ],
             "Resource": [
-                "arn:aws:lambda:*:*:function:remotion-render-*"
+                "arn:aws:lambda:*:*:function:remotion-render-viralcut"
             ]
         },
         {
@@ -145,7 +169,7 @@ S3_BUCKET=viralcut-[your-suffix]
                 "logs:PutRetentionPolicy"
             ],
             "Resource": [
-                "arn:aws:logs:*:*:log-group:/aws/lambda/remotion-render-*",
+                "arn:aws:logs:*:*:log-group:/aws/lambda/remotion-render-viralcut",
                 "arn:aws:logs:*:*:log-group:/aws/lambda-insights:*"
             ]
         },
@@ -183,9 +207,10 @@ S3_BUCKET=viralcut-[your-suffix]
 }
 ```
 
-   - **Replace `[your-suffix]`** with your actual bucket suffix
    - **Policy name**: `ViralCutCombinedPolicy`
    - Click "Create policy"
+
+   > **Security Note**: After creating your bucket, you can optionally remove the `s3:CreateBucket`, `s3:PutBucketAcl`, `s3:PutBucketOwnershipControls`, and `s3:PutBucketPublicAccessBlock` permissions from the `ViralCutS3Access` section for enhanced security, since the bucket will already exist.
 
 4. **Attach Policy to User**
    - Go back to user creation tab, refresh policies
@@ -239,10 +264,10 @@ AWS_ACCESS_KEY_ID=AKIA... # Your viralcut-user Access Key ID
 AWS_SECRET_ACCESS_KEY=... # Your viralcut-user Secret Access Key
 
 # S3 Bucket (single bucket with folder structure)
-S3_BUCKET=viralcut-[your-suffix]
+S3_BUCKET=viralcut-s3bucket
 
 # Optional: For Lambda processing (reuses same credentials)
-VIDEO_PROCESSING_LAMBDA=remotion-render-video-speed
+VIDEO_PROCESSING_LAMBDA=remotion-render-viralcut
 ```
 
 ## Step 5: Test the Setup
@@ -255,13 +280,18 @@ VIDEO_PROCESSING_LAMBDA=remotion-render-video-speed
 2. **Test upload**:
    - Go to http://localhost:3000/viralcut
    - Try uploading a small video file
-   - Check if it appears in your S3 bucket under `uploads/` folder
+   - Check if it appears in your S3 bucket `viralcut-s3bucket` under `uploads/` folder
 
 3. **Test Remotion (if already set up)**:
    ```bash
    cd packages/remotion
    pnpm with-env remotion lambda policies validate
    ```
+
+   **Expected resources created:**
+   - Lambda function: `remotion-render-viralcut`
+   - S3 bucket: `remotionlambda-viralcut` 
+   - Remotion site: `viralcut-demo`
 
 ## Benefits of Single User Approach
 
@@ -282,6 +312,28 @@ While using a single user is simpler, consider these best practices:
 5. **Key Management**: Never commit credentials to Git
 
 ## Troubleshooting
+
+### If You Already Created viralcut-user Without Bucket Creation Permission:
+
+If you've already created the `viralcut-user` with the old policy (without bucket creation permissions), here's how to fix it:
+
+1. **Update the Policy**:
+   - Go to IAM → Policies → Search for `ViralCutCombinedPolicy`
+   - Click on the policy → Click "Edit"
+   - Replace the policy JSON with the updated version above (includes `s3:CreateBucket` permissions)
+   - Click "Save changes"
+
+2. **Wait for Policy Propagation** (usually 1-2 minutes)
+
+3. **Create Your Bucket**:
+   - Go to S3 Console
+   - Click "Create bucket"
+   - Use the bucket name: `viralcut-s3bucket` (add suffix if name is taken)
+   - Follow the rest of Step 1 instructions
+
+4. **Optional Security Hardening**:
+   - After bucket creation, you can remove the bucket creation permissions from the policy
+   - Edit the policy again and remove: `s3:CreateBucket`, `s3:PutBucketAcl`, `s3:PutBucketOwnershipControls`, `s3:PutBucketPublicAccessBlock`
 
 ### Common Issues:
 

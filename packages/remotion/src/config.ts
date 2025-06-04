@@ -7,9 +7,8 @@ export const AWS_CONFIG = {
 
 // Remotion Lambda Configuration
 export const REMOTION_CONFIG = {
-  functionName:
-    process.env.REMOTION_LAMBDA_FUNCTION_NAME || "remotion-render-hello-world",
-  siteName: "hello-world-demo",
+  functionName: "remotion-render",
+  siteName: "viralcut-demo",
   timeoutInSeconds: 120,
   memorySizeInMb: 2048,
   maxRetries: 1,

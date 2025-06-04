@@ -31,16 +31,16 @@ const videoProcessingJobs = new Map<string, VideoProcessingJob>();
 // Initialize S3 service with single bucket
 const s3Service = new S3BucketService({
   region: process.env.AWS_REGION || "us-west-2",
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
+  accessKeyId: process.env.AWS_ACCESS_KEY || "",
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
-  bucket: process.env.S3_BUCKET || "viralcut-default",
+  bucket: process.env.S3_BUCKET || "viralcut-s3bucket",
 });
 
 // Initialize Lambda client
 const lambdaClient = new LambdaClient({
   region: process.env.AWS_REGION || "us-west-2",
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
+    accessKeyId: process.env.AWS_ACCESS_KEY || "",
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
   },
 });

@@ -1,13 +1,28 @@
 # AWS Setup for Remotion Lambda
 
-This document provides step-by-step instructions for setting up AWS IAM roles and policies required for Remotion Lambda.
+This document provides step-by-step instructions for setting up AWS IAM permissions required for Remotion Lambda.
 
 ## Prerequisites
 
 - AWS Account with access to IAM console
 - AWS credentials already added to `.env` file
+- **Note**: This setup now uses the unified `viralcut-user` approach from the main AWS_SETUP_GUIDE.md
 
-## Step 1: Create IAM Role Policy
+## Unified Approach (Recommended)
+
+**✅ If you're following the main AWS_SETUP_GUIDE.md:** Your `viralcut-user` already has all the required Remotion permissions. No additional setup needed!
+
+**Resource Names Used:**
+- IAM User: `viralcut-user`
+- S3 Bucket: `remotionlambda-viralcut` (auto-created)
+- Lambda Function: `remotion-render-viralcut`
+- IAM Role: `remotion-lambda-role` (auto-created)
+
+## Legacy Separate Setup (For Reference Only)
+
+*Note: This approach is deprecated in favor of the unified viralcut-user approach above.*
+
+### Step 1: Create IAM Role Policy
 
 1. Go to [AWS IAM Policies Console](https://console.aws.amazon.com/iam/home#/policies)
 2. Click "Create policy"
@@ -37,13 +52,13 @@ This document provides step-by-step instructions for setting up AWS IAM roles an
         "s3:PutObject",
         "s3:GetBucketLocation"
       ],
-      "Resource": ["arn:aws:s3:::remotionlambda-*"]
+      "Resource": ["arn:aws:s3:::remotionlambda-viralcut"]
     },
     {
       "Sid": "2",
       "Effect": "Allow",
       "Action": ["lambda:InvokeFunction"],
-      "Resource": ["arn:aws:lambda:*:*:function:remotion-render-*"]
+      "Resource": ["arn:aws:lambda:*:*:function:remotion-render-viralcut"]
     },
     {
       "Sid": "3",
@@ -56,7 +71,7 @@ This document provides step-by-step instructions for setting up AWS IAM roles an
       "Effect": "Allow",
       "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
       "Resource": [
-        "arn:aws:logs:*:*:log-group:/aws/lambda/remotion-render-*",
+        "arn:aws:logs:*:*:log-group:/aws/lambda/remotion-render-viralcut",
         "arn:aws:logs:*:*:log-group:/aws/lambda-insights:*"
       ]
     }
@@ -68,7 +83,7 @@ This document provides step-by-step instructions for setting up AWS IAM roles an
 6. Name the policy **exactly**: `remotion-lambda-policy`
 7. Click "Create policy"
 
-## Step 2: Create IAM Role
+### Step 2: Create IAM Role
 
 1. Go to [AWS IAM Roles Console](https://console.aws.amazon.com/iam/home#/roles)
 2. Click "Create role"
@@ -79,7 +94,9 @@ This document provides step-by-step instructions for setting up AWS IAM roles an
 7. Name the role **exactly**: `remotion-lambda-role`
 8. Click "Create role"
 
-## Step 3: Update User Permissions
+### Step 3: Update User Permissions (Legacy)
+
+*Note: Skip this if using the unified viralcut-user approach*
 
 1. Go to [AWS IAM Users Console](https://console.aws.amazon.com/iam/home#/users)
 2. Click on your Remotion user (the one whose credentials you're using)
@@ -132,7 +149,7 @@ This document provides step-by-step instructions for setting up AWS IAM roles an
         "s3:PutBucketPublicAccessBlock",
         "s3:PutLifecycleConfiguration"
       ],
-      "Resource": ["arn:aws:s3:::remotionlambda-*"]
+      "Resource": ["arn:aws:s3:::remotionlambda-viralcut"]
     },
     {
       "Sid": "BucketListing",
@@ -158,13 +175,13 @@ This document provides step-by-step instructions for setting up AWS IAM roles an
         "lambda:PutRuntimeManagementConfig",
         "lambda:TagResource"
       ],
-      "Resource": ["arn:aws:lambda:*:*:function:remotion-render-*"]
+      "Resource": ["arn:aws:lambda:*:*:function:remotion-render-viralcut"]
     },
     {
       "Sid": "LogsRetention",
       "Effect": "Allow",
       "Action": ["logs:CreateLogGroup", "logs:PutRetentionPolicy"],
-      "Resource": ["arn:aws:logs:*:*:log-group:/aws/lambda/remotion-render-*"]
+      "Resource": ["arn:aws:logs:*:*:log-group:/aws/lambda/remotion-render-viralcut"]
     },
     {
       "Sid": "FetchBinaries",
@@ -183,7 +200,9 @@ This document provides step-by-step instructions for setting up AWS IAM roles an
 8. Name the policy: `remotion-user-policy` (or any name you prefer)
 9. Click "Create policy"
 
-## Step 4: Validate Permissions (Optional)
+## Validation & Deployment
+
+### Step 4: Validate Permissions
 
 Run this command to validate your permissions setup:
 
@@ -192,26 +211,41 @@ cd packages/remotion
 pnpm with-env remotion lambda policies validate
 ```
 
-## Step 5: Deploy Remotion Infrastructure
+### Step 5: Deploy Remotion Infrastructure
 
-After completing the IAM setup, deploy the Lambda function and site:
+After completing the IAM setup, deploy the Lambda function and site with viralcut-specific naming:
 
 ```bash
-# Deploy Lambda function
+# Deploy Lambda function (will create remotion-render-viralcut)
 cd packages/remotion
 pnpm remotion:functions:deploy
 
-# Deploy Remotion site
+# Deploy Remotion site (will create viralcut-demo site)
 pnpm remotion:sites:create
+```
+
+## Environment Variables
+
+Make sure your `.env` file contains:
+
+```env
+# Use the same viralcut-user credentials
+AWS_REGION=us-west-2
+AWS_ACCESS_KEY_ID=AKIA... # Your viralcut-user credentials
+AWS_SECRET_ACCESS_KEY=... # Your viralcut-user credentials
+
+# Optional: Override default function name
+REMOTION_LAMBDA_FUNCTION_NAME=remotion-render-viralcut
 ```
 
 ## Troubleshooting
 
 - If you get permission errors, double-check that:
 
-  - Role name is exactly `remotion-lambda-role`
-  - Policy name is exactly `remotion-lambda-policy`
-  - User has the inline policy attached
-  - AWS credentials in `.env` are correct
+  - You're using the unified `viralcut-user` approach from the main AWS guide
+  - AWS credentials in `.env` are correct for viralcut-user
+  - The `viralcut-user` has the combined policy with all Remotion permissions
+
+- **Migration from old setup:** If you previously used separate `remotion-user`, you can safely delete it after confirming `viralcut-user` works
 
 - For additional help, see [Remotion Lambda Permissions Guide](https://www.remotion.dev/docs/lambda/permissions)

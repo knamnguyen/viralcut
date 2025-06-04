@@ -149,9 +149,12 @@ export class S3BucketService {
         Bucket: this.bucket,
         Key: key,
         ContentType: contentType,
+        ACL: "private",
       });
 
-      return await getSignedUrl(this.s3Client, command, { expiresIn });
+      return await getSignedUrl(this.s3Client, command, { 
+        expiresIn,
+      });
     } catch (error) {
       console.error("Error generating presigned upload URL:", error);
       throw new Error(`Failed to generate presigned upload URL: ${error instanceof Error ? error.message : "Unknown error"}`);

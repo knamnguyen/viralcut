@@ -11,14 +11,14 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 // Type-safe AWS region with fallback
-const REGION = (process.env.REMOTION_AWS_REGION || "us-west-2") as AwsRegion;
+const REGION = (process.env.AWS_REGION || "us-west-2") as AwsRegion;
 
 // Initialize Lambda client with credentials from environment
 const lambdaClient = new LambdaClient({
   region: REGION,
   credentials: {
-    accessKeyId: process.env.REMOTION_AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.REMOTION_AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
 });
 
@@ -54,10 +54,10 @@ export const remotionRouter = createTRPCRouter({
         });
 
         const demoSite = sites.sites.find(
-          (site) => site.id === "hello-world-demo",
+          (site) => site.id === "viralcut-demo",
         );
         if (!demoSite) {
-          throw new Error("Demo site not found. Please deploy the site first.");
+          throw new Error("ViralCut demo site not found. Please deploy the site first using 'pnpm remotion:sites:create'.");
         }
 
         // Render video on Lambda
@@ -152,7 +152,7 @@ export const remotionRouter = createTRPCRouter({
       });
 
       const demoSite = sites.sites.find(
-        (site) => site.id === "hello-world-demo",
+        (site) => site.id === "viralcut-demo",
       );
 
       return {
