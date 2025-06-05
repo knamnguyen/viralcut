@@ -409,17 +409,17 @@ const FileUploadDropzone = () => {
           
           {processedVideoData && (
             <div className="space-y-4">
-              <div className="space-y-2">
+            <div className="space-y-2">
                 <p className="text-sm text-green-700 font-medium">Processed Video Preview:</p>
-                <video
+              <video
                   src={processedVideoData.videoUrl}
-                  controls
+                controls
                   className="w-full h-60 rounded border"
-                  preload="metadata"
-                />
-              </div>
-              
-              <div className="flex gap-2">
+                preload="metadata"
+              />
+            </div>
+            
+            <div className="flex gap-2">
                 <Button 
                   onClick={() => window.open(processedVideoData.downloadUrl, '_blank')}
                   className="flex-1"
