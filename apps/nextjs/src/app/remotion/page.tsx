@@ -17,12 +17,13 @@ export default function RemotionPage() {
 
   // Get Remotion status
   const { data: status, refetch: refetchStatus } = useQuery(
-    trpc.remotion.getStatus.queryOptions(),
+    trpc.remotionHello.getStatus.queryOptions(),
   );
 
+
   // Render video mutation
-  const renderVideo = useMutation(
-    trpc.remotion.renderVideo.mutationOptions({
+  const renderVideoHello = useMutation(
+    trpc.remotionHello.renderVideoHello.mutationOptions({
       onSuccess: (data) => {
         setCurrentRender({
           renderId: data.renderId,
@@ -37,7 +38,7 @@ export default function RemotionPage() {
     currentRender?.renderId && currentRender?.bucketName,
   );
   const { data: progress, isLoading: progressLoading } = useQuery({
-    ...trpc.remotion.getRenderProgress.queryOptions({
+    ...trpc.remotionHello.getRenderProgress.queryOptions({
       renderId: currentRender?.renderId || "",
       bucketName: currentRender?.bucketName || "",
     }),
@@ -49,7 +50,7 @@ export default function RemotionPage() {
   });
 
   const handleRender = () => {
-    renderVideo.mutate({ text: text.trim() || undefined });
+    renderVideoHello.mutate({ text: text.trim() || undefined });
   };
 
   const resetRender = () => {
@@ -150,18 +151,18 @@ export default function RemotionPage() {
 
                 <button
                   onClick={handleRender}
-                  disabled={renderVideo.isPending || !text.trim()}
+                  disabled={renderVideoHello.isPending || !text.trim()}
                   className="w-full rounded-lg bg-purple-600 px-6 py-3 font-medium text-white transition-colors hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-slate-600"
                 >
-                  {renderVideo.isPending
+                  {renderVideoHello.isPending
                     ? "Starting Render..."
                     : "Generate Video"}
                 </button>
 
-                {renderVideo.error && (
+                {renderVideoHello.error && (
                   <div className="rounded border border-red-500 bg-red-900/50 p-3">
                     <span className="text-red-300">
-                      Error: {renderVideo.error.message}
+                      Error: {renderVideoHello.error.message}
                     </span>
                   </div>
                 )}

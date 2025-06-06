@@ -4,7 +4,8 @@ import { S3BucketService } from "@sassy/s3";
 import { TRPCError } from "@trpc/server";
 import { videoProcessingJobSchema } from "@sassy/s3/schema-validators";
 import type { VideoProcessingJob } from "@sassy/s3/schema-validators";
-import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
+import { RemotionService } from "../services/remotion-service";
+import type { VideoProcessingRequest, RemotionRenderResult } from "../services/remotion-service";
 
 // Video metadata schema
 const videoMetadataSchema = z.object({
@@ -20,6 +21,9 @@ const videoMetadataSchema = z.object({
   status: z.enum(["uploaded", "processing", "completed", "failed"]),
   createdAt: z.date().default(() => new Date()),
   updatedAt: z.date().default(() => new Date()),
+  // Remotion specific fields
+  renderId: z.string().optional(),
+  bucketName: z.string().optional(),
 });
 
 type VideoMetadata = z.infer<typeof videoMetadataSchema>;
@@ -31,19 +35,14 @@ const videoProcessingJobs = new Map<string, VideoProcessingJob>();
 // Initialize S3 service with single bucket
 const s3Service = new S3BucketService({
   region: process.env.AWS_REGION || "us-west-2",
-  accessKeyId: process.env.AWS_ACCESS_KEY || "",
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
   bucket: process.env.S3_BUCKET || "viralcut-s3bucket",
 });
 
-// Initialize Lambda client
-const lambdaClient = new LambdaClient({
-  region: process.env.AWS_REGION || "us-west-2",
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY || "",
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
-  },
-});
+
+// Initialize Remotion service
+const remotionService = new RemotionService();
 
 export const videoRouter = createTRPCRouter({
   // Get presigned URL for direct upload to S3
@@ -63,6 +62,8 @@ export const videoRouter = createTRPCRouter({
           input.contentType,
           3600 // 1 hour expiry
         );
+
+        console.log("uploadUrl", uploadUrl);
         
         return {
           success: true,
@@ -190,7 +191,173 @@ export const videoRouter = createTRPCRouter({
       };
     }),
 
-  // Start video processing job
+  // Adjust video speed using Remotion
+  adjustVideoSpeed: publicProcedure
+    .input(
+      z.object({
+        videoId: z.string(),
+        speedMultiplier: z.number().min(0.1).max(10).default(0.5),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const metadata = videoMetadataStore.get(input.videoId);
+      
+      if (!metadata) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Video metadata not found",
+        });
+      }
+      
+      if (metadata.status === "processing") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Video is already being processed",
+        });
+      }
+      
+      try {
+        // Create video URL from S3 bucket and key
+        const videoUrl = `https://${s3Service.getBucket()}.s3.${process.env.AWS_REGION || "us-west-2"}.amazonaws.com/${metadata.originalKey}`;
+        
+        const request: VideoProcessingRequest = {
+          videoUrl,
+          speedMultiplier: input.speedMultiplier,
+          originalDuration: metadata.originalDuration,
+        };
+
+        console.log("request", request);
+        console.log("remotionService", remotionService);
+        // console.log("starting remotion processing");
+        
+        // Start Remotion processing
+        const result: RemotionRenderResult = await remotionService.processVideoSpeed(request);
+        
+        
+        // Update video status to processing
+        const updatedMetadata: VideoMetadata = {
+          ...metadata,
+          status: "processing",
+          speedMultiplier: input.speedMultiplier,
+          renderId: result.renderId,
+          bucketName: result.bucketName,
+          updatedAt: new Date(),
+        };
+        
+        videoMetadataStore.set(input.videoId, updatedMetadata);
+        
+        return {
+          success: true,
+          renderId: result.renderId,
+          bucketName: result.bucketName,
+          message: result.message,
+        };
+      } catch (error) {
+        console.error("Error adjusting video speed:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to adjust video speed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        });
+      }
+    }),
+
+  // Get processing progress for Remotion render
+  getProcessingProgress: publicProcedure
+    .input(z.object({ videoId: z.string() }))
+    .query(async ({ input }) => {
+      const metadata = videoMetadataStore.get(input.videoId);
+      
+      if (!metadata) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Video metadata not found",
+        });
+      }
+      
+      if (!metadata.renderId || !metadata.bucketName) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "No processing job found for this video",
+        });
+      }
+      
+      try {
+        const progress = await remotionService.getRenderProgress(
+          metadata.renderId,
+          metadata.bucketName
+        );
+        
+        // Update video status if processing is complete
+        if (progress.done && progress.outputFile && progress.outputBucket) {
+          const updatedMetadata: VideoMetadata = {
+            ...metadata,
+            status: "completed",
+            processedKey: progress.outputFile,
+            updatedAt: new Date(),
+          };
+          
+          videoMetadataStore.set(input.videoId, updatedMetadata);
+        } else if (progress.fatalErrorEncountered) {
+          const updatedMetadata: VideoMetadata = {
+            ...metadata,
+            status: "failed",
+            updatedAt: new Date(),
+          };
+          
+          videoMetadataStore.set(input.videoId, updatedMetadata);
+        }
+        
+        return progress;
+      } catch (error) {
+        console.error("Error getting processing progress:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to get processing progress: ${error instanceof Error ? error.message : "Unknown error"}`,
+        });
+      }
+    }),
+
+  // Get processed video URL
+  getProcessedVideoUrl: publicProcedure
+    .input(z.object({ videoId: z.string() }))
+    .query(async ({ input }) => {
+      const metadata = videoMetadataStore.get(input.videoId);
+      
+      if (!metadata) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Video metadata not found",
+        });
+      }
+      
+      if (metadata.status !== "completed" || !metadata.bucketName || !metadata.processedKey) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Processed video is not available",
+        });
+      }
+      
+      try {
+        const downloadUrl = remotionService.generateDownloadUrl(
+          metadata.bucketName,
+          metadata.processedKey
+        );
+        
+        return {
+          success: true,
+          downloadUrl,
+          videoUrl: downloadUrl, // For preview
+        };
+      } catch (error) {
+        console.error("Error generating processed video URL:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to generate processed video URL: ${error instanceof Error ? error.message : "Unknown error"}`,
+        });
+      }
+    }),
+
+  // Legacy endpoints for backward compatibility
   startProcessing: publicProcedure
     .input(
       z.object({
@@ -216,74 +383,35 @@ export const videoRouter = createTRPCRouter({
       }
       
       try {
-        // Create a job ID
-        const jobId = `job-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
+        // Create video URL from S3 bucket and key
+        const videoUrl = `https://${s3Service.getBucket()}.s3.${process.env.AWS_REGION || "us-west-2"}.amazonaws.com/${metadata.originalKey}`;
+        
+        const request: VideoProcessingRequest = {
+          videoUrl,
+          speedMultiplier: input.speedMultiplier,
+          originalDuration: metadata.originalDuration,
+        };
+        
+        // Start Remotion processing
+        const result: RemotionRenderResult = await remotionService.processVideoSpeed(request);
         
         // Update video status to processing
         const updatedMetadata: VideoMetadata = {
           ...metadata,
           status: "processing",
           speedMultiplier: input.speedMultiplier,
+          renderId: result.renderId,
+          bucketName: result.bucketName,
           updatedAt: new Date(),
         };
         
         videoMetadataStore.set(input.videoId, updatedMetadata);
         
-        // Create a processing job
-        const job: VideoProcessingJob = {
-          jobId,
-          status: "pending",
-          progress: 0,
-          originalKey: metadata.originalKey,
-          speedMultiplier: input.speedMultiplier,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+        return {
+          success: true,
+          jobId: result.renderId, // Use renderId as jobId for legacy compatibility
+          message: result.message,
         };
-        
-        videoProcessingJobs.set(jobId, job);
-        
-        // Invoke Lambda function to process the video
-        // This would be where you trigger your Remotion Lambda
-        const lambdaName = process.env.VIDEO_PROCESSING_LAMBDA || "remotion-render-video-speed";
-        
-        try {
-          const command = new InvokeCommand({
-            FunctionName: lambdaName,
-            InvocationType: "Event", // Asynchronous invocation
-            Payload: Buffer.from(JSON.stringify({
-              jobId,
-              videoId: input.videoId,
-              originalKey: metadata.originalKey,
-              bucket: s3Service.getBucket(),
-              speedMultiplier: input.speedMultiplier,
-            })),
-          });
-          
-          await lambdaClient.send(command);
-          
-          // Update job status
-          job.status = "processing";
-          videoProcessingJobs.set(jobId, job);
-          
-          return {
-            success: true,
-            jobId,
-            message: "Video processing started",
-          };
-        } catch (error) {
-          // Update job and video status on error
-          job.status = "failed";
-          job.error = `Lambda invocation failed: ${error instanceof Error ? error.message : "Unknown error"}`;
-          videoProcessingJobs.set(jobId, job);
-          
-          updatedMetadata.status = "failed";
-          videoMetadataStore.set(input.videoId, updatedMetadata);
-          
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: `Failed to start video processing: ${error instanceof Error ? error.message : "Unknown error"}`,
-          });
-        }
       } catch (error) {
         console.error("Error starting video processing:", error);
         throw new TRPCError({
@@ -293,7 +421,7 @@ export const videoRouter = createTRPCRouter({
       }
     }),
 
-  // Get processing job status
+  // Get processing job status (legacy)
   getJobStatus: publicProcedure
     .input(z.object({ jobId: z.string() }))
     .query(({ input }) => {
@@ -325,7 +453,7 @@ export const videoRouter = createTRPCRouter({
         });
       }
       
-      if (metadata.status !== "completed" || !metadata.processedKey) {
+      if (metadata.status !== "completed" || !metadata.bucketName || !metadata.processedKey) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Processed video is not available",
@@ -333,9 +461,9 @@ export const videoRouter = createTRPCRouter({
       }
       
       try {
-        const downloadUrl = await s3Service.getPresignedDownloadUrl(
-          metadata.processedKey,
-          input.expiresIn || 3600 // Default 1 hour expiry
+        const downloadUrl = remotionService.generateDownloadUrl(
+          metadata.bucketName,
+          metadata.processedKey
         );
         
         return {

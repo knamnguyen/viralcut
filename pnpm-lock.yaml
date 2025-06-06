@@ -248,6 +248,9 @@ importers:
       '@sassy/db':
         specifier: workspace:*
         version: link:../db
+      '@sassy/remotion':
+        specifier: workspace:*
+        version: link:../remotion
       '@sassy/s3':
         specifier: workspace:*
         version: link:../s3
