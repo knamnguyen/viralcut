@@ -7,12 +7,16 @@ import {
   ListObjectsV2Command,
   GetObjectCommandInput,
   S3ClientConfig,
+  CreateMultipartUploadCommand,
+  UploadPartCommand,
+  CompleteMultipartUploadCommand,
+  AbortMultipartUploadCommand,
 } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Readable } from "stream";
 
-import { S3Config, S3UploadResult } from "./schema-validators";
+import { S3Config, S3UploadResult, MultipartUploadInitResponse, MultipartUploadPartResponse, MultipartUploadCompleteRequest } from "./schema-validators";
 
 /**
  * S3BucketService class for handling S3 bucket operations
@@ -133,7 +137,7 @@ export class S3BucketService {
   }
 
   /**
-   * Get a presigned URL for uploading a file
+   * Get a presigned URL for uploading a file (single part upload)
    * @param key - The key to save the file under (including folder prefix)
    * @param contentType - The content type of the file
    * @param expiresIn - The number of seconds until the URL expires (default: 3600)
@@ -158,6 +162,143 @@ export class S3BucketService {
     } catch (error) {
       console.error("Error generating presigned upload URL:", error);
       throw new Error(`Failed to generate presigned upload URL: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  }
+
+  /**
+   * Initialize a multipart upload
+   * @param key - The key to save the file under (including folder prefix)
+   * @param contentType - The content type of the file
+   * @returns Upload ID and initial data needed for multipart upload
+   */
+  async initializeMultipartUpload(
+    key: string,
+    contentType?: string,
+  ): Promise<MultipartUploadInitResponse> {
+    try {
+      const command = new CreateMultipartUploadCommand({
+        Bucket: this.bucket,
+        Key: key,
+        ContentType: contentType,
+        ACL: "private",
+      });
+
+      const response = await this.s3Client.send(command);
+
+      if (!response.UploadId) {
+        throw new Error("Failed to get upload ID from S3");
+      }
+
+      return {
+        uploadId: response.UploadId,
+        key,
+        bucket: this.bucket,
+      };
+    } catch (error) {
+      console.error("Error initializing multipart upload:", error);
+      throw new Error(`Failed to initialize multipart upload: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  }
+
+  /**
+   * Get presigned URLs for uploading multiple parts
+   * @param key - The key of the file
+   * @param uploadId - The upload ID from initialization
+   * @param partNumbers - Array of part numbers (1-based)
+   * @param expiresIn - The number of seconds until the URLs expire (default: 3600)
+   * @returns Array of presigned URLs for each part
+   */
+  async getPresignedUploadPartUrls(
+    key: string,
+    uploadId: string,
+    partNumbers: number[],
+    expiresIn = 3600,
+  ): Promise<MultipartUploadPartResponse[]> {
+    try {
+      const urlPromises = partNumbers.map(async (partNumber) => {
+        const command = new UploadPartCommand({
+          Bucket: this.bucket,
+          Key: key,
+          UploadId: uploadId,
+          PartNumber: partNumber,
+        });
+
+        const url = await getSignedUrl(this.s3Client, command, { expiresIn });
+        
+        return {
+          partNumber,
+          uploadUrl: url,
+        };
+      });
+
+      return await Promise.all(urlPromises);
+    } catch (error) {
+      console.error("Error generating presigned part URLs:", error);
+      throw new Error(`Failed to generate presigned part URLs: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  }
+
+  /**
+   * Complete a multipart upload
+   * @param key - The key of the file
+   * @param uploadId - The upload ID from initialization
+   * @param parts - Array of completed parts with ETags
+   * @returns The upload result
+   */
+  async completeMultipartUpload(
+    key: string,
+    uploadId: string,
+    parts: MultipartUploadCompleteRequest['parts'],
+  ): Promise<S3UploadResult> {
+    try {
+      const command = new CompleteMultipartUploadCommand({
+        Bucket: this.bucket,
+        Key: key,
+        UploadId: uploadId,
+        MultipartUpload: {
+          Parts: parts.map((part: { partNumber: number; etag: string }) => ({
+            ETag: part.etag,
+            PartNumber: part.partNumber,
+          })),
+        },
+      });
+
+      const response = await this.s3Client.send(command);
+
+      return {
+        key,
+        bucket: this.bucket,
+        location: response.Location || `https://${this.bucket}.s3.${this.s3Client.config.region}.amazonaws.com/${key}`,
+        etag: response.ETag?.replace(/"/g, ""),
+      };
+    } catch (error) {
+      console.error("Error completing multipart upload:", error);
+      throw new Error(`Failed to complete multipart upload: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  }
+
+  /**
+   * Abort a multipart upload (cleanup)
+   * @param key - The key of the file
+   * @param uploadId - The upload ID from initialization
+   * @returns True if successfully aborted
+   */
+  async abortMultipartUpload(
+    key: string,
+    uploadId: string,
+  ): Promise<boolean> {
+    try {
+      const command = new AbortMultipartUploadCommand({
+        Bucket: this.bucket,
+        Key: key,
+        UploadId: uploadId,
+      });
+
+      await this.s3Client.send(command);
+      return true;
+    } catch (error) {
+      console.error("Error aborting multipart upload:", error);
+      throw new Error(`Failed to abort multipart upload: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 

@@ -14,6 +14,8 @@ import { DropzoneOptions } from "react-dropzone";
 import { useTRPC } from "~/trpc/react";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMultipartUpload } from "~/hooks/use-multipart-upload";
+
  
 const FileUploadDropzone = () => {
   const [files, setFiles] = useState<File[] | null>([]);
@@ -28,19 +30,24 @@ const FileUploadDropzone = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  // tRPC mutations
-  const getUploadUrl = useMutation(
-    trpc.video.getUploadUrl.mutationOptions({
-      onError: (err: any) => {
-        console.error("Failed to get upload URL:", err.message);
-        toast.error("Failed to get upload URL");
-        setUploadStatus("failed");
-      },
-    })
-  );
+  // Multipart upload hook
+  const { uploadFile: uploadFileWithMultipart, isUploading: isMultipartUploading } = useMultipartUpload({
+    onProgress: (progress) => {
+      setUploadProgress(progress.percentage);
+    },
+    onSuccess: (result) => {
+      console.log("Upload successful:", result);
+      // Continue with metadata saving
+    },
+    onError: (error) => {
+      console.error("Upload error:", error);
+      toast.error(`Error: ${error.message}`);
+      setUploadStatus("failed");
+    },
+  });
   
   const saveMetadata = useMutation(
-    trpc.video.saveMetadata.mutationOptions({
+    trpc.remotion.saveMetadata.mutationOptions({
       onError: (err: any) => {
         console.error("Failed to save video metadata:", err.message);
         toast.error("Failed to save video metadata");
@@ -49,7 +56,7 @@ const FileUploadDropzone = () => {
   );
 
   const adjustVideoSpeed = useMutation(
-    trpc.video.adjustVideoSpeed.mutationOptions({
+    trpc.remotion.adjustVideoSpeed.mutationOptions({
       onSuccess: (data) => {
         setRenderId(data.renderId);
         setProcessingStatus("processing");
@@ -65,7 +72,7 @@ const FileUploadDropzone = () => {
 
   // Query for processing progress
   const { data: progress } = useQuery({
-    ...trpc.video.getProcessingProgress.queryOptions({
+    ...trpc.remotion.getProcessingProgress.queryOptions({
       videoId: uploadedVideoId || "",
     }),
     enabled: Boolean(uploadedVideoId && processingStatus === "processing"),
@@ -76,7 +83,7 @@ const FileUploadDropzone = () => {
 
   // Query for processed video URL
   const { data: processedVideoData, error: processedVideoError, isLoading: processedVideoLoading } = useQuery({
-    ...trpc.video.getProcessedVideoUrl.queryOptions({
+    ...trpc.remotion.getDownloadUrl.queryOptions({
       videoId: uploadedVideoId || "",
     }),
     enabled: Boolean(uploadedVideoId && processingStatus === "completed"),
@@ -114,6 +121,8 @@ const FileUploadDropzone = () => {
     maxSize: VIDEO_CONSTRAINTS.MAX_SIZE, // 2GB
   } satisfies DropzoneOptions;
 
+
+
   const uploadToS3 = async (file: File, uploadUrl: string): Promise<boolean> => {
     try {
       const response = await fetch(uploadUrl, {
@@ -136,6 +145,8 @@ const FileUploadDropzone = () => {
     }
   };
 
+
+
   const handleUpload = async () => {
     if (!files || files.length === 0) {
       toast.error("Please select a video file first");
@@ -148,32 +159,14 @@ const FileUploadDropzone = () => {
     setUploadProgress(0);
 
     try {
-      // Step 1: Get presigned upload URL
-      setUploadProgress(20);
-      const uploadData = await getUploadUrl.mutateAsync({
-        fileName: file.name,
-        contentType: file.type,
-        prefix: "uploads",
-      });
+      // Use the multipart upload hook (automatically chooses single vs multipart)
+      const uploadResult = await uploadFileWithMultipart(file);
 
-      if (!uploadData.success) {
-        throw new Error("Failed to get upload URL");
-      }
-
-      // Step 2: Upload file to S3
-      setUploadProgress(40);
-      const uploadSuccess = await uploadToS3(file, uploadData.uploadUrl);
-      
-      if (!uploadSuccess) {
-        throw new Error("Failed to upload file to S3");
-      }
-
-      setUploadProgress(70);
-
-      // Step 3: Get video duration for metadata
+      // Step 2: Get video duration for metadata
+      setUploadProgress(80);
       const duration = await getVideoDuration(file);
       
-      // Step 4: Save video metadata
+      // Step 3: Save video metadata
       const videoId = `video-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
       
       await saveMetadata.mutateAsync({
@@ -181,7 +174,7 @@ const FileUploadDropzone = () => {
         originalName: file.name,
         originalSize: file.size,
         originalDuration: duration,
-        originalKey: uploadData.key,
+        originalKey: uploadResult.key,
         format: file.type,
         status: "uploaded",
       });
@@ -412,7 +405,7 @@ const FileUploadDropzone = () => {
             <div className="space-y-2">
                 <p className="text-sm text-green-700 font-medium">Processed Video Preview:</p>
               <video
-                  src={processedVideoData.videoUrl}
+                  src={processedVideoData.downloadUrl}
                 controls
                   className="w-full h-60 rounded border"
                 preload="metadata"

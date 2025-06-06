@@ -136,6 +136,9 @@ importers:
 
   apps/nextjs:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.525.0
+        version: 3.787.0
       '@clerk/nextjs':
         specifier: ^6.12.5
         version: 6.19.5(next@15.3.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(svix@1.65.0)
@@ -401,6 +404,12 @@ importers:
       '@sassy/db':
         specifier: workspace:*
         version: link:../db
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.76.1(react@19.0.0)
+      react:
+        specifier: catalog:react19
+        version: 19.0.0
       zod:
         specifier: 'catalog:'
         version: 3.25.13

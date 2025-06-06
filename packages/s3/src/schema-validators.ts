@@ -20,6 +20,35 @@ export const s3UploadResultSchema = z.object({
 
 export type S3UploadResult = z.infer<typeof s3UploadResultSchema>;
 
+// Multipart upload initialization response schema
+export const multipartUploadInitResponseSchema = z.object({
+  uploadId: z.string(),
+  key: z.string(),
+  bucket: z.string(),
+});
+
+export type MultipartUploadInitResponse = z.infer<typeof multipartUploadInitResponseSchema>;
+
+// Multipart upload part response schema
+export const multipartUploadPartResponseSchema = z.object({
+  partNumber: z.number(),
+  uploadUrl: z.string(),
+});
+
+export type MultipartUploadPartResponse = z.infer<typeof multipartUploadPartResponseSchema>;
+
+// Multipart upload complete request schema
+export const multipartUploadCompleteRequestSchema = z.object({
+  key: z.string(),
+  uploadId: z.string(),
+  parts: z.array(z.object({
+    partNumber: z.number(),
+    etag: z.string(),
+  })),
+});
+
+export type MultipartUploadCompleteRequest = z.infer<typeof multipartUploadCompleteRequestSchema>;
+
 // Video processing job schema
 export const videoProcessingJobSchema = z.object({
   jobId: z.string(),

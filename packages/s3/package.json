@@ -14,7 +14,10 @@
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
-    "with-env": "dotenv -e ../../.env --"
+    "with-env": "dotenv -e ../../.env --",
+    "update-bucket-policy": "pnpm with-env aws s3api put-bucket-policy --bucket $S3_BUCKET_NAME --policy file://bucket-policy.json",
+    "update-cors-config": "pnpm with-env aws s3api put-bucket-cors --bucket $S3_BUCKET_NAME --cors-configuration file://cors-config.json",
+    "update-s3-config": "pnpm update-bucket-policy && pnpm update-cors-config"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.525.0",
