@@ -9,10 +9,10 @@ export const AWS_CONFIG = {
 export const REMOTION_CONFIG = {
   functionName: "remotion-render",
   siteName: "viralcut-demo",
-  timeoutInSeconds: 120,
-  memorySizeInMb: 2048,
+  timeoutInSeconds: 900,
+  memorySizeInMb: 3008,
   maxRetries: 1,
-  framesPerLambda: 20,
+  framesPerLambda: 10,
 } as const;
 
 // Video Configuration

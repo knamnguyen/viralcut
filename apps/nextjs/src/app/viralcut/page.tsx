@@ -21,11 +21,20 @@ const FileUploadDropzone = () => {
   const [files, setFiles] = useState<File[] | null>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedVideoId, setUploadedVideoId] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "completed" | "failed">("idle");
   const [speedMultiplier, setSpeedMultiplier] = useState(0.5);
   const [processingStatus, setProcessingStatus] = useState<"idle" | "processing" | "completed" | "failed">("idle");
-  const [renderId, setRenderId] = useState<string | null>(null);
+  
+  // Store processing data from Remotion
+  const [processingData, setProcessingData] = useState<{
+    renderId: string;
+    bucketName: string;
+    videoUrl: string;
+    originalDuration: number;
+  } | null>(null);
+  
+  // Store final result
+  const [processedVideoUrl, setProcessedVideoUrl] = useState<string | null>(null);
 
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -37,7 +46,6 @@ const FileUploadDropzone = () => {
     },
     onSuccess: (result) => {
       console.log("Upload successful:", result);
-      // Continue with metadata saving
     },
     onError: (error) => {
       console.error("Upload error:", error);
@@ -46,19 +54,9 @@ const FileUploadDropzone = () => {
     },
   });
   
-  const saveMetadata = useMutation(
-    trpc.remotion.saveMetadata.mutationOptions({
-      onError: (err: any) => {
-        console.error("Failed to save video metadata:", err.message);
-        toast.error("Failed to save video metadata");
-      },
-    })
-  );
-
-  const adjustVideoSpeed = useMutation(
-    trpc.remotion.adjustVideoSpeed.mutationOptions({
+  const processVideoSpeed = useMutation(
+    trpc.remotion.processVideoSpeed.mutationOptions({
       onSuccess: (data) => {
-        setRenderId(data.renderId);
         setProcessingStatus("processing");
         toast.success("Video processing started!");
       },
@@ -72,21 +70,23 @@ const FileUploadDropzone = () => {
 
   // Query for processing progress
   const { data: progress } = useQuery({
-    ...trpc.remotion.getProcessingProgress.queryOptions({
-      videoId: uploadedVideoId || "",
+    ...trpc.remotion.getRenderProgress.queryOptions({
+      renderId: processingData?.renderId || "",
+      bucketName: processingData?.bucketName || "",
     }),
-    enabled: Boolean(uploadedVideoId && processingStatus === "processing"),
+    enabled: Boolean(processingData?.renderId && processingData?.bucketName && processingStatus === "processing"),
     refetchInterval: (data: any) => {
       return processingStatus === "processing" && !data?.done ? 10000 : false;
     },
   });
 
-  // Query for processed video URL
-  const { data: processedVideoData, error: processedVideoError, isLoading: processedVideoLoading } = useQuery({
+  // Query for download URL when processing is complete
+  const { data: downloadData } = useQuery({
     ...trpc.remotion.getDownloadUrl.queryOptions({
-      videoId: uploadedVideoId || "",
+      bucketName: processingData?.bucketName || "",
+      outputFile: progress?.outputFile || "",
     }),
-    enabled: Boolean(uploadedVideoId && processingStatus === "completed"),
+    enabled: Boolean(processingData?.bucketName && progress?.outputFile && progress?.done && !progress?.fatalErrorEncountered),
   });
 
   // Update processing status based on progress
@@ -95,21 +95,19 @@ const FileUploadDropzone = () => {
       setProcessingStatus("failed");
     } else {
       setProcessingStatus("completed");
-      // Invalidate all video queries to ensure fresh data
-      queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === 'video'
-      });
+      if (downloadData?.downloadUrl) {
+        setProcessedVideoUrl(downloadData.downloadUrl);
+      }
     }
   }
 
-  // Debug logging for processed video data
+  // Debug logging
   console.log("Frontend Debug:", {
-    uploadedVideoId,
+    processingData,
     processingStatus,
-    processedVideoData,
-    processedVideoError,
-    processedVideoLoading,
-    queryEnabled: Boolean(uploadedVideoId && processingStatus === "completed")
+    progress,
+    downloadData,
+    processedVideoUrl,
   });
  
   const dropzone = {
@@ -120,32 +118,6 @@ const FileUploadDropzone = () => {
     maxFiles: 1,
     maxSize: VIDEO_CONSTRAINTS.MAX_SIZE, // 2GB
   } satisfies DropzoneOptions;
-
-
-
-  const uploadToS3 = async (file: File, uploadUrl: string): Promise<boolean> => {
-    try {
-      const response = await fetch(uploadUrl, {
-        method: "PUT",
-        body: file,
-        headers: {
-          "Content-Type": file.type,
-        },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("S3 Upload failed:", { status: response.status, error: errorText });
-      }
-
-      return response.ok;
-    } catch (error) {
-      console.error("S3 upload error:", error);
-      return false;
-    }
-  };
-
-
 
   const handleUpload = async () => {
     if (!files || files.length === 0) {
@@ -159,28 +131,22 @@ const FileUploadDropzone = () => {
     setUploadProgress(0);
 
     try {
-      // Use the multipart upload hook (automatically chooses single vs multipart)
+      // Step 1: Upload to S3 using multipart upload
       const uploadResult = await uploadFileWithMultipart(file);
 
-      // Step 2: Get video duration for metadata
+      // Step 2: Get video duration for processing
       setUploadProgress(80);
       const duration = await getVideoDuration(file);
       
-      // Step 3: Save video metadata
-      const videoId = `video-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
-      
-      await saveMetadata.mutateAsync({
-        id: videoId,
-        originalName: file.name,
-        originalSize: file.size,
+      // Step 3: Store processing info for later use
+      setProcessingData({
+        renderId: "", // Will be set after processing starts
+        bucketName: "", // Will be set after processing starts
+        videoUrl: uploadResult.location,
         originalDuration: duration,
-        originalKey: uploadResult.key,
-        format: file.type,
-        status: "uploaded",
       });
 
       setUploadProgress(100);
-      setUploadedVideoId(videoId);
       setUploadStatus("completed");
       
       toast.success("Video uploaded successfully!");
@@ -195,15 +161,29 @@ const FileUploadDropzone = () => {
   };
 
   const handleAdjustSpeed = async () => {
-    if (!uploadedVideoId) {
+    if (!processingData?.videoUrl) {
       toast.error("No video available for processing");
       return;
     }
 
-    await adjustVideoSpeed.mutateAsync({
-      videoId: uploadedVideoId,
-      speedMultiplier,
-    });
+    try {
+      const result = await processVideoSpeed.mutateAsync({
+        videoUrl: processingData.videoUrl,
+        speedMultiplier,
+        originalDuration: processingData.originalDuration,
+      });
+
+      // Update processing data with render info
+      setProcessingData(prev => prev ? {
+        ...prev,
+        renderId: result.renderId,
+        bucketName: result.bucketName,
+      } : null);
+
+    } catch (error) {
+      console.error("Processing error:", error);
+      setProcessingStatus("failed");
+    }
   };
 
   const getVideoDuration = (file: File): Promise<number> => {
@@ -225,11 +205,11 @@ const FileUploadDropzone = () => {
 
   const resetUpload = () => {
     setFiles([]);
-    setUploadedVideoId(null);
     setUploadStatus("idle");
     setUploadProgress(0);
     setProcessingStatus("idle");
-    setRenderId(null);
+    setProcessingData(null);
+    setProcessedVideoUrl(null);
   };
 
   const getUploadStatusMessage = () => {
@@ -354,10 +334,10 @@ const FileUploadDropzone = () => {
             
             <Button 
               onClick={handleAdjustSpeed}
-              disabled={adjustVideoSpeed.isPending}
+              disabled={processVideoSpeed.isPending}
               className="w-full"
             >
-              {adjustVideoSpeed.isPending ? "Starting Processing..." : "Adjust Video Speed"}
+              {processVideoSpeed.isPending ? "Starting Processing..." : "Adjust Video Speed"}
             </Button>
             
             <Button onClick={resetUpload} variant="outline" className="w-full">
@@ -388,24 +368,16 @@ const FileUploadDropzone = () => {
             Video Processing Complete!
           </h3>
           
-          {processedVideoLoading && (
+          {!processedVideoUrl && (
             <p className="text-sm text-blue-700">Loading processed video...</p>
           )}
           
-          {processedVideoError && (
-            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
-              <p className="text-sm text-yellow-800">
-                Error loading video: {processedVideoError.message}
-              </p>
-            </div>
-          )}
-          
-          {processedVideoData && (
+          {processedVideoUrl && (
             <div className="space-y-4">
             <div className="space-y-2">
                 <p className="text-sm text-green-700 font-medium">Processed Video Preview:</p>
               <video
-                  src={processedVideoData.downloadUrl}
+                  src={processedVideoUrl}
                 controls
                   className="w-full h-60 rounded border"
                 preload="metadata"
@@ -414,7 +386,7 @@ const FileUploadDropzone = () => {
             
             <div className="flex gap-2">
                 <Button 
-                  onClick={() => window.open(processedVideoData.downloadUrl, '_blank')}
+                  onClick={() => window.open(processedVideoUrl, '_blank')}
                   className="flex-1"
                 >
                   Download Video
@@ -426,7 +398,7 @@ const FileUploadDropzone = () => {
             </div>
           )}
           
-          {!processedVideoData && !processedVideoLoading && !processedVideoError && (
+          {!processedVideoUrl && (
             <div className="space-y-2">
               <p className="text-sm text-gray-600">
                 Video URL not available yet. This may take a moment...
