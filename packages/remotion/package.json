@@ -15,8 +15,9 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
     "with-env": "dotenv -e ../../.env --",
     "remotion:functions:deploy": "pnpm with-env remotion lambda functions deploy --timeout=900 --memory=3008",
+    "remotion:functions:list": "pnpm with-env remotion lambda functions ls",
     "remotion:sites:create": "pnpm with-env remotion lambda sites create src/Root.tsx --site-name=viralcut-demo",
-    "remotion:sites:ls": "pnpm with-env remotion lambda sites ls",
+    "remotion:sites:list": "pnpm with-env remotion lambda sites ls",
     "remotion:render": "pnpm with-env remotion lambda render"
   },
   "dependencies": {

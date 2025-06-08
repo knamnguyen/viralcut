@@ -46,16 +46,16 @@ export class RemotionService {
    * @returns Practical framesPerLambda setting that avoids concurrency limits
    */
   private calculatePracticalFramesPerLambda(durationInFrames: number): number {
-    // Conservative approach: Target max 20-30 Lambda functions to avoid concurrency limits
-    // Most AWS accounts have default concurrency limit of 1000, but we want to be safe
-    const maxDesiredLambdas = 25;
+    // Very conservative approach: Target max 5-10 Lambda functions to avoid concurrency limits
+    // Many AWS accounts have low default concurrency limits, especially new accounts
+    const maxDesiredLambdas = 8;
     
     // Calculate frames per Lambda to stay under the limit
     const calculatedFramesPerLambda = Math.ceil(durationInFrames / maxDesiredLambdas);
     
-    // For very long videos, ensure each Lambda processes at least 10 seconds but not more than 30 seconds
-    const minFramesPerLambda = 300; // 10 seconds at 30fps
-    const maxFramesPerLambda = 900; // 30 seconds at 30fps
+    // For very long videos, ensure each Lambda processes at least 30 seconds but not more than 120 seconds
+    const minFramesPerLambda = 900; // 30 seconds at 30fps
+    const maxFramesPerLambda = 3600; // 120 seconds at 30fps
     
     // Clamp the value between min and max
     const finalFramesPerLambda = Math.max(
@@ -66,7 +66,7 @@ export class RemotionService {
     const actualLambdaCount = Math.ceil(durationInFrames / finalFramesPerLambda);
     const processingTimePerLambda = finalFramesPerLambda / 30;
     
-    console.log("Conservative framesPerLambda calculation:", {
+    console.log("Ultra-conservative framesPerLambda calculation:", {
       durationInFrames,
       totalVideoDuration: `${(durationInFrames / 30 / 60).toFixed(1)} minutes`,
       maxDesiredLambdas,
@@ -74,7 +74,8 @@ export class RemotionService {
       finalFramesPerLambda,
       actualLambdaCount,
       processingTimePerLambda: `${processingTimePerLambda.toFixed(1)} seconds of video per Lambda`,
-      expectedWithinTimeout: processingTimePerLambda < 300 ? "✅ Yes" : "❌ No - increase timeout"
+      expectedWithinTimeout: processingTimePerLambda < 600 ? "✅ Yes" : "❌ No - increase timeout",
+      concurrencyNote: `Using only ${actualLambdaCount} concurrent Lambda functions to avoid rate limits`
     });
     
     return finalFramesPerLambda;
@@ -136,7 +137,7 @@ export class RemotionService {
   async getFunctions() {
     return await getFunctions({
       region: this.region,
-      compatibleOnly: true,
+      compatibleOnly: false,
     });
   }
 
@@ -262,9 +263,13 @@ export class RemotionService {
    * Get render progress for a video processing job
    */
   async getRenderProgress(renderId: string, bucketName: string): Promise<RemotionProgress> {
+    console.log("getRenderProgress called with:", { renderId, bucketName, region: this.region });
+    
     try {
       // Get deployed functions
+      console.log("Getting functions for progress check...");
       const functions = await this.getFunctions();
+      console.log("Functions found for progress:", functions.map(f => ({ name: f.functionName, version: f.version })));
 
       if (functions.length === 0) {
         throw new Error("No Remotion Lambda functions found.");
@@ -275,11 +280,21 @@ export class RemotionService {
         throw new Error("Function name is undefined");
       }
 
+      console.log("Calling getRenderProgress with:", { renderId, bucketName, functionName, region: this.region });
+      
       const progress = await getRenderProgress({
         renderId,
         bucketName,
         functionName,
         region: this.region,
+      });
+
+      console.log("Progress result:", {
+        done: progress.done,
+        progress: progress.overallProgress,
+        outputFile: progress.outputFile,
+        errors: progress.errors,
+        fatalErrorEncountered: progress.fatalErrorEncountered
       });
 
       return {
