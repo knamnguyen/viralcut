@@ -37,6 +37,8 @@ export const VideoSpeedAdjust: React.FC<VideoSpeedAdjustProps> = ({
         }}
         playbackRate={speedMultiplier}
         volume={1}
+        delayRenderTimeoutInMilliseconds={300000}
+        delayRenderRetries={2}
       />
     </AbsoluteFill>
   );

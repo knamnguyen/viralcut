@@ -10,9 +10,9 @@ export const REMOTION_CONFIG = {
   functionName: "remotion-render",
   siteName: "viralcut-demo",
   timeoutInSeconds: 900,
-  memorySizeInMb: 3008,
+  memorySizeInMb: 4096,
   maxRetries: 1,
-  framesPerLambda: 10,
+  framesPerLambda: 400,
 } as const;
 
 // Video Configuration

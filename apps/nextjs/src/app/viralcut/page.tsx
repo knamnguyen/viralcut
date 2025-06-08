@@ -68,32 +68,6 @@ const FileUploadDropzone = () => {
     })
   );
 
-  const preprocessVideo = useMutation(
-    trpc.remotion.preprocessVideo.mutationOptions({
-      onSuccess: (data) => {
-        console.log("Preprocessing successful:", data);
-      },
-      onError: (err: any) => {
-        console.error("Preprocessing failed:", err.message);
-        toast.error("Video preprocessing failed");
-        setProcessingStatus("failed");
-      },
-    })
-  );
-
-  const processSegments = useMutation(
-    trpc.remotion.processSegments.mutationOptions({
-      onSuccess: (data) => {
-        console.log("Segment processing started:", data);
-      },
-      onError: (err: any) => {
-        console.error("Segment processing failed:", err.message);
-        toast.error("Segment processing failed");
-        setProcessingStatus("failed");
-      },
-    })
-  );
-
   // Query for processing progress
   const { data: progress } = useQuery({
     ...trpc.remotion.getRenderProgress.queryOptions({
@@ -193,51 +167,22 @@ const FileUploadDropzone = () => {
     }
 
     try {
-      setProcessingStatus("processing");
-      
-      // Step 1: Preprocess video into segments
-      console.log("🎬 Starting video preprocessing...");
-      toast.info("Preprocessing video into segments...");
-      
-      const preprocessResult = await preprocessVideo.mutateAsync({
+      const result = await processVideoSpeed.mutateAsync({
         videoUrl: processingData.videoUrl,
+      speedMultiplier,
         originalDuration: processingData.originalDuration,
-        segmentDurationMinutes: 2, // 2-minute segments
       });
 
-      console.log("✅ Preprocessing completed:", preprocessResult);
-      toast.success(`Video split into ${preprocessResult.totalSegments} segments`);
-
-      // Step 2: Process segments in parallel
-      console.log("🚀 Starting parallel segment processing...");
-      toast.info("Processing segments with speed adjustment...");
-      
-      const segmentResult = await processSegments.mutateAsync({
-        segments: preprocessResult.segments,
-        speedMultiplier,
-        preprocessingId: preprocessResult.preprocessingId,
-      });
-
-      console.log("✅ Segment processing started:", segmentResult);
-      toast.success(`Started processing ${segmentResult.segmentResults.length} segments`);
-
-      // Update processing data with first segment's render info for progress tracking
-      const firstSegmentResult = segmentResult.segmentResults[0];
-      if (firstSegmentResult) {
-        setProcessingData(prev => prev ? {
-          ...prev,
-          renderId: firstSegmentResult.renderId,
-          bucketName: firstSegmentResult.bucketName,
-          preprocessingId: preprocessResult.preprocessingId,
-          segments: preprocessResult.segments,
-          segmentResults: segmentResult.segmentResults,
-        } : null);
-      }
+      // Update processing data with render info
+      setProcessingData(prev => prev ? {
+        ...prev,
+        renderId: result.renderId,
+        bucketName: result.bucketName,
+      } : null);
 
     } catch (error) {
-      console.error("❌ Processing error:", error);
+      console.error("Processing error:", error);
       setProcessingStatus("failed");
-      toast.error(`Processing failed: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   };
 
@@ -389,7 +334,7 @@ const FileUploadDropzone = () => {
             
             <Button 
               onClick={handleAdjustSpeed}
-              disabled={processVideoSpeed.isPending || preprocessVideo.isPending || processSegments.isPending}
+              disabled={processVideoSpeed.isPending}
               className="w-full"
             >
               {processVideoSpeed.isPending ? "Starting Processing..." : "Adjust Video Speed"}

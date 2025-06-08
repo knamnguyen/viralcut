@@ -4,6 +4,7 @@ import {
   getRenderProgress,
   getSites,
   renderMediaOnLambda,
+  speculateFunctionName,
 } from "@remotion/lambda/client";
 import { REMOTION_CONFIG } from "@sassy/remotion/config";
 
@@ -46,36 +47,45 @@ export class RemotionService {
    * @returns Practical framesPerLambda setting that avoids concurrency limits
    */
   private calculatePracticalFramesPerLambda(durationInFrames: number): number {
-    // Very conservative approach: Target max 5-10 Lambda functions to avoid concurrency limits
-    // Many AWS accounts have low default concurrency limits, especially new accounts
-    const maxDesiredLambdas = 8;
+    // NEW AGGRESSIVE STRATEGY: 200 frames per Lambda for speed across the board
+    // Maximum 400 frames per Lambda to stay under 50 Lambda functions
     
-    // Calculate frames per Lambda to stay under the limit
-    const calculatedFramesPerLambda = Math.ceil(durationInFrames / maxDesiredLambdas);
+    const targetFramesPerLambda = 200; // 6.67 seconds of video at 30fps
+    const maxFramesPerLambda = 400; // 13.33 seconds of video at 30fps  
+    const maxAllowedLambdas = 50; // Hard limit
     
-    // For very long videos, ensure each Lambda processes at least 30 seconds but not more than 120 seconds
-    const minFramesPerLambda = 900; // 30 seconds at 30fps
-    const maxFramesPerLambda = 3600; // 120 seconds at 30fps
+    // Calculate how many Lambdas we'd need with target frames
+    const calculatedLambdaCount = Math.ceil(durationInFrames / targetFramesPerLambda);
     
-    // Clamp the value between min and max
-    const finalFramesPerLambda = Math.max(
-      minFramesPerLambda,
-      Math.min(calculatedFramesPerLambda, maxFramesPerLambda)
-    );
+    let finalFramesPerLambda: number;
+    let finalLambdaCount: number;
     
-    const actualLambdaCount = Math.ceil(durationInFrames / finalFramesPerLambda);
-    const processingTimePerLambda = finalFramesPerLambda / 30;
+    if (calculatedLambdaCount <= maxAllowedLambdas) {
+      // We can use target frames per Lambda
+      finalFramesPerLambda = targetFramesPerLambda;
+      finalLambdaCount = calculatedLambdaCount;
+    } else {
+      // We need to increase frames per Lambda to stay under limit
+      finalFramesPerLambda = Math.min(
+        Math.ceil(durationInFrames / maxAllowedLambdas),
+        maxFramesPerLambda
+      );
+      finalLambdaCount = Math.ceil(durationInFrames / finalFramesPerLambda);
+    }
     
-    console.log("Ultra-conservative framesPerLambda calculation:", {
+    const videoSecondsPerLambda = finalFramesPerLambda / 30;
+    
+    console.log("AGGRESSIVE SPEED STRATEGY:", {
       durationInFrames,
       totalVideoDuration: `${(durationInFrames / 30 / 60).toFixed(1)} minutes`,
-      maxDesiredLambdas,
-      calculatedFramesPerLambda,
+      targetFramesPerLambda,
+      maxFramesPerLambda,
+      maxAllowedLambdas,
       finalFramesPerLambda,
-      actualLambdaCount,
-      processingTimePerLambda: `${processingTimePerLambda.toFixed(1)} seconds of video per Lambda`,
-      expectedWithinTimeout: processingTimePerLambda < 600 ? "✅ Yes" : "❌ No - increase timeout",
-      concurrencyNote: `Using only ${actualLambdaCount} concurrent Lambda functions to avoid rate limits`
+      finalLambdaCount,
+      videoSecondsPerLambda: `${videoSecondsPerLambda.toFixed(1)} seconds of video per Lambda`,
+      strategy: "200 frames/Lambda for speed, max 400 frames to stay under 50 Lambdas",
+      concurrency: "Will use concurrencyPerLambda: 3 for parallel processing"
     });
     
     return finalFramesPerLambda;
@@ -139,6 +149,11 @@ export class RemotionService {
       region: this.region,
       compatibleOnly: false,
     });
+    // return await speculateFunctionName({
+    //   memorySizeInMb: 3008,
+    //   diskSizeInMb: 2048,
+    //   timeoutInSeconds: 900,
+    // })
   }
 
   /**
@@ -226,7 +241,7 @@ export class RemotionService {
       });
 
       // Render video on Lambda with optimized settings for long videos
-      const { renderId, bucketName } = await renderMediaOnLambda({
+      const renderResult = await renderMediaOnLambda({
         region: this.region,
         functionName,
         serveUrl: demoSite.serveUrl,
@@ -240,10 +255,22 @@ export class RemotionService {
         imageFormat: "jpeg",
         maxRetries: 1,
         framesPerLambda: practicalFramesPerLambda,
+        concurrencyPerLambda: 1, // Single browser tab for better video processing performance
         privacy: "public",
-        // Use updated timeout settings for long video processing
-        timeoutInMilliseconds: REMOTION_CONFIG.timeoutInSeconds * 1000,
+        // Increase timeout significantly for large video processing
+        timeoutInMilliseconds: 600000, // 10 minutes per chunk
+        // Add verbose logging for debugging
+        logLevel: "verbose",
       });
+
+      const { renderId, bucketName } = renderResult;
+      
+      // Log debugging information
+      console.log("🔍 DEBUGGING INFO:");
+      console.log("CloudWatch Logs:", renderResult.cloudWatchLogs);
+      console.log("S3 Console Folder:", renderResult.folderInS3Console);
+      console.log("Render ID:", renderId);
+      console.log("Bucket Name:", bucketName);
 
       return {
         renderId,
@@ -294,8 +321,25 @@ export class RemotionService {
         progress: progress.overallProgress,
         outputFile: progress.outputFile,
         errors: progress.errors,
-        fatalErrorEncountered: progress.fatalErrorEncountered
+        fatalErrorEncountered: progress.fatalErrorEncountered,
+        // Additional debugging info
+        chunks: progress.chunks,
+        timeToFinish: progress.timeToFinish,
+        renderId: progress.renderId,
+        bucket: progress.bucket
       });
+
+      // If progress is stuck, log additional debugging info
+      if (!progress.done && progress.overallProgress > 0 && progress.overallProgress < 1) {
+        console.log("🚨 RENDER APPEARS STUCK - DEBUGGING INFO:");
+        console.log("Progress percentage:", (progress.overallProgress * 100).toFixed(1) + "%");
+        console.log("Chunks info:", progress.chunks);
+        console.log("Time to finish estimate:", progress.timeToFinish);
+        console.log("Errors so far:", progress.errors);
+        
+        // Log the full progress object to see all available properties
+        console.log("Full progress object:", JSON.stringify(progress, null, 2));
+      }
 
       return {
         done: progress.done,
