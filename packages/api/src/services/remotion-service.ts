@@ -34,6 +34,15 @@ export interface RemotionProgress {
   fatalErrorEncountered?: boolean;
 }
 
+export interface VideoStitchRequest {
+  videoUrl: string;
+  clips: Array<{
+    range: string;
+    caption: string;
+  }>;
+  originalDuration: number;
+}
+
 export class RemotionService {
   private region: AwsRegion;
 
@@ -358,6 +367,124 @@ export class RemotionService {
       console.error("Error getting render progress:", error);
       throw new Error(
         `Failed to get render progress: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
+    }
+  }
+
+  /**
+   * Start video stitch processing
+   */
+  async processVideoStitch(request: VideoStitchRequest): Promise<RemotionRenderResult> {
+    console.log("processVideoStitch triggered");
+    try {
+      // Get deployed functions
+      const functions = await this.getFunctions();
+      
+      if (functions.length === 0) {
+        throw new Error(
+          "No Remotion Lambda functions found. Please deploy a function first."
+        );
+      }
+
+      const functionName = functions[0]?.functionName;
+      if (!functionName) {
+        throw new Error("Function name is undefined");
+      }
+
+      // Get the viralcut demo site
+      const demoSite = await this.getViralCutSite();
+
+      console.log("starting video stitch processing inside service");
+      console.log("functions", functions);
+      console.log("functionName", functionName);
+      console.log("demoSite", demoSite);
+      console.log("request", request);
+      console.log("region", this.region);
+      console.log("serveUrl", demoSite.serveUrl);
+      console.log("composition", "VideoStitch");
+      console.log("inputProps", {
+        videoUrl: request.videoUrl,
+        clips: request.clips,
+      });
+      console.log("codec", "h264");
+
+      // Calculate the total duration based on clip durations inline
+      let totalClipDurationSeconds = 0;
+      for (const clip of request.clips) {
+        const [startStr, endStr] = clip.range.split('-');
+        if (startStr && endStr) {
+          const startParts = startStr.trim().split(':').map(Number);
+          const endParts = endStr.trim().split(':').map(Number);
+          
+          let startSeconds = 0;
+          let endSeconds = 0;
+          
+          if (startParts.length === 2) {
+            startSeconds = startParts[0]! * 60 + startParts[1]!;
+          }
+          if (endParts.length === 2) {
+            endSeconds = endParts[0]! * 60 + endParts[1]!;
+          }
+          
+          totalClipDurationSeconds += (endSeconds - startSeconds);
+        }
+      }
+      const fps = 30;
+      const durationInFrames = Math.ceil(totalClipDurationSeconds * fps);
+      
+      // Use Remotion's default optimization for framesPerLambda
+      const practicalFramesPerLambda = undefined;
+      
+      console.log("VideoStitch duration calculations:", {
+        totalClipDurationSeconds,
+        fps,
+        durationInFrames,
+        clipCount: request.clips.length,
+        practicalFramesPerLambda: "undefined (using Remotion defaults)",
+        note: "Letting Remotion optimize concurrency automatically"
+      });
+
+      // Render video on Lambda with optimized settings
+      const renderResult = await renderMediaOnLambda({
+        region: this.region,
+        functionName,
+        serveUrl: demoSite.serveUrl,
+        composition: "VideoStitch",
+        inputProps: {
+          videoUrl: request.videoUrl,
+          clips: request.clips,
+        },
+        codec: "h264",
+        imageFormat: "jpeg",
+        maxRetries: 1,
+        framesPerLambda: practicalFramesPerLambda,
+        concurrencyPerLambda: 1, // Single browser tab for better video processing performance
+        privacy: "public",
+        // Increase timeout for video stitching
+        timeoutInMilliseconds: 3000000, 
+        // Add verbose logging for debugging
+        logLevel: "verbose",
+      });
+
+      const { renderId, bucketName } = renderResult;
+      
+      // Log debugging information
+      console.log("🔍 VideoStitch DEBUGGING INFO:");
+      console.log("CloudWatch Logs:", renderResult.cloudWatchLogs);
+      console.log("S3 Console Folder:", renderResult.folderInS3Console);
+      console.log("Render ID:", renderId);
+      console.log("Bucket Name:", bucketName);
+
+      return {
+        renderId,
+        bucketName,
+        success: true,
+        message: "Video stitch processing started successfully",
+      };
+    } catch (error) {
+      console.error("Error processing video stitch:", error);
+      throw new Error(
+        `Failed to process video stitch: ${error instanceof Error ? error.message : "Unknown error"}`
       );
     }
   }
