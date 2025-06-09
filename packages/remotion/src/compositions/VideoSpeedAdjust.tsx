@@ -1,7 +1,7 @@
 import React from "react";
 import {
   AbsoluteFill,
-  Video,
+  OffthreadVideo,
   useVideoConfig,
   staticFile,
 } from "remotion";
@@ -9,13 +9,11 @@ import {
 interface VideoSpeedAdjustProps {
   videoUrl: string;
   speedMultiplier: number;
-  durationInFrames?: number;
 }
 
 export const VideoSpeedAdjust: React.FC<VideoSpeedAdjustProps> = ({
   videoUrl,
   speedMultiplier = 1,
-  durationInFrames,
 }) => {
   const { width, height } = useVideoConfig();
 
@@ -28,7 +26,7 @@ export const VideoSpeedAdjust: React.FC<VideoSpeedAdjustProps> = ({
         alignItems: "center",
       }}
     >
-      <Video
+      <OffthreadVideo
         src={videoUrl}
         style={{
           width: width,
@@ -37,8 +35,8 @@ export const VideoSpeedAdjust: React.FC<VideoSpeedAdjustProps> = ({
         }}
         playbackRate={speedMultiplier}
         volume={1}
-        delayRenderTimeoutInMilliseconds={300000}
-        delayRenderRetries={2}
+        delayRenderTimeoutInMilliseconds={300000} // 5 minutes for video loading
+        delayRenderRetries={3} // Increased retries for large videos
       />
     </AbsoluteFill>
   );

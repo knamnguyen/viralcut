@@ -228,7 +228,12 @@ export class RemotionService {
       const durationInFrames = Math.ceil(adjustedDurationInSeconds * fps);
       
       // Use practical framesPerLambda for simple scenarios
-      const practicalFramesPerLambda = this.calculatePracticalFramesPerLambda(durationInFrames);
+      // const practicalFramesPerLambda = this.calculatePracticalFramesPerLambda(durationInFrames);
+      
+      // Let Remotion choose optimal framesPerLambda based on video length
+      // This follows Remotion's built-in concurrency optimization that interpolates
+      // between 75-150 concurrency based on frame count and ensures minimum 20 frames per Lambda
+      const practicalFramesPerLambda = undefined; // Use Remotion's default optimization
       
       console.log("Duration calculations:", {
         originalDurationInSeconds,
@@ -236,8 +241,8 @@ export class RemotionService {
         fps,
         durationInFrames,
         speedMultiplier: request.speedMultiplier,
-        practicalFramesPerLambda,
-        expectedLambdaCount: Math.ceil(durationInFrames / practicalFramesPerLambda)
+        practicalFramesPerLambda: "undefined (using Remotion defaults)",
+        note: "Letting Remotion optimize concurrency automatically"
       });
 
       // Render video on Lambda with optimized settings for long videos
@@ -249,7 +254,6 @@ export class RemotionService {
         inputProps: {
           videoUrl: request.videoUrl,
           speedMultiplier: request.speedMultiplier,
-          durationInFrames,
         },
         codec: "h264",
         imageFormat: "jpeg",
@@ -257,8 +261,8 @@ export class RemotionService {
         framesPerLambda: practicalFramesPerLambda,
         concurrencyPerLambda: 1, // Single browser tab for better video processing performance
         privacy: "public",
-        // Increase timeout significantly for large video processing
-        timeoutInMilliseconds: 600000, // 10 minutes per chunk
+        // Increase timeout significantly for large video processing  
+        timeoutInMilliseconds: 3000000, 
         // Add verbose logging for debugging
         logLevel: "verbose",
       });
