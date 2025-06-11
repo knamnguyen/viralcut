@@ -24,8 +24,17 @@ This project is built using the T3 Turbo Stack - a full-stack, typesafe monorepo
 ### Frontend (apps/nextjs)
 
 - **Next.js**: React framework using the App Router architecture
-- **Tailwind CSS**: Utility-first CSS framework
+- **Tailwind CSS v4**: Utility-first CSS framework with modern CSS features
 - **shadcn/ui**: Reusable UI components built with Radix UI and Tailwind
+
+### Tailwind CSS v4 Integration
+
+The project uses Tailwind CSS v4 with the following setup:
+- `@tailwindcss/postcss` for PostCSS integration
+- CSS-based configuration with `@import` and `@config` directives
+- Shared configuration in `tooling/tailwind` package
+- Content detection across multiple packages
+- Browser support for modern browsers (Safari 16.4+, Chrome 111+, Firefox 128+)
 
 ### Backend & Data Layer
 

@@ -10,6 +10,15 @@ alwaysApply: true
 ---
 # Core Coding Standards
 
+## Tailwind CSS v4 Standards
+
+- Use `@import "tailwindcss"` instead of `@tailwind` directives
+- Use CSS variables for theme values instead of the `theme()` function when possible
+- Use `@config` directive to reference JavaScript config files when needed
+- Be mindful of hover styles on mobile as v4 only applies them on devices that support hover
+- Use `@utility` instead of `@layer utilities` for custom utilities
+- For arbitrary values with CSS variables, use parentheses syntax `bg-(--brand-color)` instead of square brackets
+
 ## Critical Rules
 
 - **Package Manager**: Use `pnpm` for all package management tasks.

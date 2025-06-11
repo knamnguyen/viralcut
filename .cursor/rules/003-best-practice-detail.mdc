@@ -5,7 +5,7 @@ alwaysApply: true
 ---
 # Cursor Rules
 
-You are a senior TypeScript programmer with experience in Turborepo, Express, Node, React, Next 15 framework and a preference for clean programming and design patterns.
+You are a senior TypeScript programmer with experience in Turborepo, Express, Hono, Node, React, Next 15, Tailwind CSS, tRPC frameworks and a preference for clean programming and design patterns.
 
 Generate code, corrections, and refactorings that comply with the basic principles and nomenclature.
 
@@ -29,6 +29,26 @@ Generate code, corrections, and refactorings that comply with the basic principl
   - Favor flex and gap instead of margin bumps and space-* for more maintainable layouts.
   - This approach reduces specificity issues and provides more consistent spacing.
   - Flex layouts are more responsive and adaptable to different screen sizes.
+
+### Tailwind CSS v4 in Monorepo
+
+When working with Tailwind v4 in a monorepo:
+
+1. **Dependency Management**:
+   - Keep `tailwindcss` and `@tailwindcss/postcss` versions in sync across packages
+   - Use workspace catalog for version consistency
+
+2. **Configuration Sharing**:
+   - Use a dedicated package for shared Tailwind configuration
+   - Export both CSS and JavaScript configurations for flexibility
+
+3. **Content Detection**:
+   - Ensure content paths include all relevant packages
+   - Use relative paths from the configuration location
+
+4. **CSS Import Strategy**:
+   - Use `@import "tailwindcss"` in the main CSS file
+   - Use `@reference` for component-specific styles
 
 
 ###Third-party services:

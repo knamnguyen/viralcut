@@ -58,7 +58,7 @@ export default function RemotionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8 text-center">
           <h1 className="mb-4 text-4xl font-bold text-white">
@@ -141,7 +141,7 @@ export default function RemotionPage() {
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     placeholder="Enter your text here..."
-                    className="w-full rounded-lg border border-slate-600 bg-slate-700 px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full rounded-lg border border-slate-600 bg-slate-700 px-4 py-2 text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-purple-500"
                     maxLength={200}
                   />
                   <p className="mt-1 text-xs text-slate-400">

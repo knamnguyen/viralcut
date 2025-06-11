@@ -404,7 +404,7 @@ const FileUploadDropzone = () => {
                         value={clip.range}
                         onChange={(e) => updateClip(index, "range", e.target.value)}
                         placeholder="01:30-02:00"
-                        className="w-full p-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full p-2 text-sm border rounded focus:outline-hidden focus:ring-2 focus:ring-green-500"
                       />
                     </div>
                     
@@ -416,7 +416,7 @@ const FileUploadDropzone = () => {
                         onChange={(e) => updateClip(index, "caption", e.target.value)}
                         placeholder="Enter caption..."
                         maxLength={200}
-                        className="w-full p-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full p-2 text-sm border rounded focus:outline-hidden focus:ring-2 focus:ring-green-500"
                       />
                     </div>
                   </div>

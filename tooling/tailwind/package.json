@@ -15,6 +15,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@tailwindcss/postcss": "catalog:",
     "postcss": "^8.5.1",
     "tailwindcss": "catalog:",
     "tailwindcss-animate": "^1.0.7"

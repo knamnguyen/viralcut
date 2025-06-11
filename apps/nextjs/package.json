@@ -40,6 +40,7 @@
     "@sassy/prettier-config": "workspace:*",
     "@sassy/tailwind-config": "workspace:*",
     "@sassy/tsconfig": "workspace:*",
+    "@tailwindcss/postcss": "^4.1.8",
     "@types/node": "^22.10.10",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
@@ -47,7 +48,7 @@
     "eslint": "catalog:",
     "jiti": "^1.21.7",
     "prettier": "catalog:",
-    "tailwindcss": "catalog:",
+    "tailwindcss": "^4.1.8",
     "typescript": "catalog:"
   },
   "prettier": "@sassy/prettier-config"
