@@ -24,6 +24,8 @@
     "@sassy/stripe": "workspace:*",
     "@sassy/validators": "workspace:*",
     "@trpc/server": "catalog:",
+    "data-fns": "^1.1.0",
+    "date-fns": "^4.1.0",
     "superjson": "2.2.2",
     "zod": "catalog:"
   },

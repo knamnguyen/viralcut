@@ -4,9 +4,10 @@ import {
   getRenderProgress,
   getSites,
   renderMediaOnLambda,
-  speculateFunctionName,
+  speculateFunctionName,  
 } from "@remotion/lambda/client";
 import { REMOTION_CONFIG } from "@sassy/remotion/config";
+import { format } from "date-fns";
 
 // Type-safe AWS region with fallback - using Remotion-specific env vars
 const REGION = (process.env.REMOTION_AWS_REGION || "us-west-2") as AwsRegion;
@@ -48,106 +49,6 @@ export class RemotionService {
 
   constructor() {
     this.region = REGION;
-  }
-
-  /**
-   * Calculate practical framesPerLambda - optimized to avoid AWS concurrency limits
-   * @param durationInFrames Total frames in the video
-   * @returns Practical framesPerLambda setting that avoids concurrency limits
-   */
-  private calculatePracticalFramesPerLambda(durationInFrames: number): number {
-    // NEW AGGRESSIVE STRATEGY: 200 frames per Lambda for speed across the board
-    // Maximum 400 frames per Lambda to stay under 50 Lambda functions
-    
-    const targetFramesPerLambda = 200; // 6.67 seconds of video at 30fps
-    const maxFramesPerLambda = 400; // 13.33 seconds of video at 30fps  
-    const maxAllowedLambdas = 50; // Hard limit
-    
-    // Calculate how many Lambdas we'd need with target frames
-    const calculatedLambdaCount = Math.ceil(durationInFrames / targetFramesPerLambda);
-    
-    let finalFramesPerLambda: number;
-    let finalLambdaCount: number;
-    
-    if (calculatedLambdaCount <= maxAllowedLambdas) {
-      // We can use target frames per Lambda
-      finalFramesPerLambda = targetFramesPerLambda;
-      finalLambdaCount = calculatedLambdaCount;
-    } else {
-      // We need to increase frames per Lambda to stay under limit
-      finalFramesPerLambda = Math.min(
-        Math.ceil(durationInFrames / maxAllowedLambdas),
-        maxFramesPerLambda
-      );
-      finalLambdaCount = Math.ceil(durationInFrames / finalFramesPerLambda);
-    }
-    
-    const videoSecondsPerLambda = finalFramesPerLambda / 30;
-    
-    console.log("AGGRESSIVE SPEED STRATEGY:", {
-      durationInFrames,
-      totalVideoDuration: `${(durationInFrames / 30 / 60).toFixed(1)} minutes`,
-      targetFramesPerLambda,
-      maxFramesPerLambda,
-      maxAllowedLambdas,
-      finalFramesPerLambda,
-      finalLambdaCount,
-      videoSecondsPerLambda: `${videoSecondsPerLambda.toFixed(1)} seconds of video per Lambda`,
-      strategy: "200 frames/Lambda for speed, max 400 frames to stay under 50 Lambdas",
-      concurrency: "Will use concurrencyPerLambda: 3 for parallel processing"
-    });
-    
-    return finalFramesPerLambda;
-  }
-
-  /**
-   * Calculate optimal framesPerLambda based on video duration and concurrency constraints
-   * @param durationInFrames Total frames in the video
-   * @param expectedConcurrentUsers Expected number of simultaneous users
-   * @param accountConcurrencyLimit Your AWS account concurrency limit (default: 1000)
-   * @returns Optimal framesPerLambda setting
-   */
-  private calculateOptimalFramesPerLambda(
-    durationInFrames: number, 
-    expectedConcurrentUsers: number = 10,
-    accountConcurrencyLimit: number = 1000
-  ): number {
-    // For very short videos or low concurrency scenarios, use config default
-    if (durationInFrames <= 100 || expectedConcurrentUsers <= 1) {
-      return REMOTION_CONFIG.framesPerLambda;
-    }
-
-    // Reserve some concurrency for other functions (20% buffer)
-    const availableConcurrency = Math.floor(accountConcurrencyLimit * 0.8);
-    
-    // Calculate max concurrency per video render
-    const maxConcurrencyPerRender = Math.floor(availableConcurrency / expectedConcurrentUsers);
-    
-    // Ensure we don't exceed Remotion's 200 function limit
-    const maxAllowedConcurrency = Math.min(maxConcurrencyPerRender, 200);
-    
-    // Calculate framesPerLambda, ensuring minimum of 4 and using config as fallback
-    const calculatedFramesPerLambda = Math.max(
-      Math.ceil(durationInFrames / maxAllowedConcurrency),
-      4
-    );
-    
-    // Use the larger of calculated value or config default to avoid over-parallelization
-    const framesPerLambda = Math.max(calculatedFramesPerLambda, REMOTION_CONFIG.framesPerLambda);
-    
-    console.log("FramesPerLambda calculation:", {
-      durationInFrames,
-      expectedConcurrentUsers,
-      accountConcurrencyLimit,
-      availableConcurrency,
-      maxConcurrencyPerRender,
-      maxAllowedConcurrency,
-      calculatedFramesPerLambda,
-      configDefault: REMOTION_CONFIG.framesPerLambda,
-      finalFramesPerLambda: framesPerLambda
-    });
-    
-    return framesPerLambda;
   }
 
   /**
@@ -255,6 +156,8 @@ export class RemotionService {
       });
 
       // Render video on Lambda with optimized settings for long videos
+
+      const currentTime = format(new Date(), "yyyy-MM-dd-HH-mm-ss");
       const renderResult = await renderMediaOnLambda({
         region: this.region,
         functionName,
@@ -274,6 +177,10 @@ export class RemotionService {
         timeoutInMilliseconds: 3000000, 
         // Add verbose logging for debugging
         logLevel: "verbose",
+        outName: {
+          key: `video-speed-adjusted-${currentTime}.mp4`,
+          bucketName: "video-speed-adjust-output",
+        }
       });
 
       const { renderId, bucketName } = renderResult;
@@ -444,6 +351,7 @@ export class RemotionService {
         note: "Letting Remotion optimize concurrency automatically"
       });
 
+      const currentTime = format(new Date(), "yyyy-MM-dd-HH-mm-ss");
       // Render video on Lambda with optimized settings
       const renderResult = await renderMediaOnLambda({
         region: this.region,
@@ -464,6 +372,10 @@ export class RemotionService {
         timeoutInMilliseconds: 3000000, 
         // Add verbose logging for debugging
         logLevel: "verbose",
+        outName: {
+          key: `video-stitched-${currentTime}.mp4`,
+          bucketName: "video-stitch-output",
+        }
       });
 
       const { renderId, bucketName } = renderResult;
