@@ -22,6 +22,8 @@ alwaysApply: true
 ## Critical Rules
 
 - **Package Manager**: Use `pnpm` for all package management tasks.
+- **Script Runner**: Use `bun` for executing all standalone TypeScript script files (e.g., `bun run scripts/my-script.ts`).
+- **Script Management**: For simple, one-line commands, add them directly to the `scripts` object in `package.json`. For complex tasks, create a dedicated `.ts` file in a `scripts/` directory and invoke it from `package.json` using `bun`.
 - **Monorepo Structure**: Place reusable code in packages under `packages/` and applications under `apps/`.
 - **Package Naming**: Name all packages under the `@sassy/` scope (e.g., `@sassy/utils`, `@sassy/ui`).
 - **File/Directory Naming**: Use `kebab-case` for all file and directory names (e.g., `src/lib/utils.ts`, `src/components/user-profile`).
@@ -135,8 +137,6 @@ alwaysApply: true
 
 <example type="invalid">
   ```typescript
-  // Using npm/yarn instead of pnpm
-  // npm install lodash
 
   // Using a different build tool
   // "build": "tsc"
