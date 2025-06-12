@@ -1,12 +1,7 @@
-import React from "react";
-import {
-  AbsoluteFill,
-  OffthreadVideo,
-  Sequence,
-  useVideoConfig,
-} from "remotion";
-import type { VideoStitchClip } from "../schema-validators";
-import { parseTimeRange, secondsToFrames } from "../utils/time-parsing";
+import { AbsoluteFill, Sequence, OffthreadVideo, useVideoConfig  } from 'remotion';
+import { secondsToFrames } from '../utils/time-parsing';
+import { VideoStitchClip } from '../schema-validators'; 
+import { parseTimeRange } from '../utils/time-parsing';
 
 interface VideoStitchProps {
   videoUrl: string;
@@ -18,18 +13,10 @@ export const VideoStitch: React.FC<VideoStitchProps> = ({
   clips,
 }) => {
   const { width, height, fps } = useVideoConfig();
-
   let currentFrame = 0;
 
   return (
-    <AbsoluteFill
-      style={{
-        backgroundColor: "#000000",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+    <AbsoluteFill className="bg-black flex items-center justify-center">
       {clips.map((clip, index) => {
         const { startSeconds, endSeconds } = parseTimeRange(clip.range);
         const startFrame = secondsToFrames(startSeconds, fps);
@@ -40,57 +27,60 @@ export const VideoStitch: React.FC<VideoStitchProps> = ({
           from: currentFrame,
           durationInFrames: clipDurationInFrames,
         };
-
-        // Update currentFrame for next clip
         currentFrame += clipDurationInFrames;
 
         return (
           <Sequence key={index} {...sequenceProps}>
             <AbsoluteFill>
-              {/* Video with trimming */}
+              {/* Video is always fit inside container with aspect ratio 6:19 (object-contain) */}
               <OffthreadVideo
                 src={videoUrl}
                 startFrom={startFrame}
                 endAt={endFrame}
-                style={{
-                  width: width,
-                  height: height,
-                  objectFit: "contain",
-                }}
+                // Tailwind classes for sizing and object-fit
+                className="w-full h-full object-contain"
                 volume={1}
                 delayRenderTimeoutInMilliseconds={300000}
                 delayRenderRetries={3}
               />
-              
-              {/* Text overlay */}
+
+              {/* Caption Overlay */}
               {clip.caption && (
-                <AbsoluteFill
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-end",
-                    justifyContent: "center",
-                    padding: "40px",
-                  }}
+                <div
+                  // Absolute positioning at 80% from top and horizontal center
+                  className="
+                    absolute
+                    left-1/2
+                    top-[80%]
+                    -translate-x-1/2
+                    -translate-y-1/2
+                    flex
+                    justify-center
+                    w-full
+                  "
                 >
                   <div
+                    className="
+                      bg-black/80
+                      text-white
+                      px-6
+                      py-4
+                      rounded-lg
+                      font-semibold
+                      text-center
+                      max-w-[80%]
+                      shadow-lg
+                      border
+                      border-white/10
+                      text-[max(1.5rem,min(2.5vw,3rem))]
+                    "
                     style={{
-                      backgroundColor: "rgba(0, 0, 0, 0.8)",
-                      color: "white",
-                      padding: "16px 24px",
-                      borderRadius: "8px",
-                      fontSize: Math.min(width / 25, 48),
-                      fontFamily: "SF Pro Display, system-ui, sans-serif",
-                      fontWeight: "600",
-                      textAlign: "center",
-                      maxWidth: width * 0.8,
-                      wordWrap: "break-word",
-                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-                      border: "2px solid rgba(255, 255, 255, 0.1)",
+                      fontFamily: 'SF Pro Display, system-ui, sans-serif',
                     }}
                   >
                     {clip.caption}
                   </div>
-                </AbsoluteFill>
+                </div>
               )}
             </AbsoluteFill>
           </Sequence>
@@ -98,4 +88,4 @@ export const VideoStitch: React.FC<VideoStitchProps> = ({
       })}
     </AbsoluteFill>
   );
-}; 
+};

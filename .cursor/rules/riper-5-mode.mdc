@@ -126,7 +126,7 @@ Phase 3: User Approval Collection
 
 Phase 4: Implementation for Approved Items
 For each approved improvement:
-- Memory Storage: Use both add_to_memory and mcp_byterover-mcp_create-memories with context summary
+- Memory Storage: Use  add_to_memory with context summary
 - Rule File Update: Read target file, check for overlap, append to relevant section or integrate contextually
 - Validation: Ensure cursor rule file format compliance and no contradictions
 

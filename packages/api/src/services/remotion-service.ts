@@ -177,10 +177,7 @@ export class RemotionService {
         timeoutInMilliseconds: 3000000, 
         // Add verbose logging for debugging
         logLevel: "verbose",
-        outName: {
-          key: `video-speed-adjusted-${currentTime}.mp4`,
-          bucketName: "video-speed-adjust-output",
-        }
+        outName: `video-speed-adjusted-${currentTime}.mp4`
       });
 
       const { renderId, bucketName } = renderResult;
@@ -372,10 +369,7 @@ export class RemotionService {
         timeoutInMilliseconds: 3000000, 
         // Add verbose logging for debugging
         logLevel: "verbose",
-        outName: {
-          key: `video-stitched-${currentTime}.mp4`,
-          bucketName: "video-stitch-output",
-        }
+        outName: `video-stitched-${currentTime}.mp4`
       });
 
       const { renderId, bucketName } = renderResult;

@@ -39,13 +39,22 @@ export const HelloWorld = ({
 
   return (
     <AbsoluteFill
-      className="bg-[#000212] flex justify-center items-center font-['SF_Pro_Display,system-ui,sans-serif']"
+      style={{
+        backgroundColor: "#000212",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        fontFamily: "SF Pro Display, system-ui, sans-serif",
+      }}
     >
       <div
-        className="text-white text-[100px] font-bold text-center"
         style={{
+          color: "#ffffff",
+          fontSize: 100,
+          fontWeight: "bold",
           transform: `scale(${scale})`,
           opacity,
+          textAlign: "center",
           textShadow: "0 0 20px rgba(255, 255, 255, 0.5)",
         }}
       >

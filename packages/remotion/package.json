@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "sideEffects": ["*.css"],
   "exports": {
     ".": "./src/index.ts",
-    "./config": "./src/config.ts"
+    "./config": "./src/config.ts",
+    "./schema-validators": "./src/schema-validators.ts",
+    "./compositions/VideoSpeedAdjust": "./src/compositions/VideoSpeedAdjust.tsx"
   },
   "license": "MIT",
   "scripts": {
@@ -23,19 +26,21 @@
     "test:metadata": "bun scripts/test-metadata.ts"
   },
   "dependencies": {
-    "@remotion/cli": "^4.0.311",
-    "@remotion/lambda": "^4.0.311",
-    "@remotion/media-parser": "^4.0.314",
-    "@remotion/media-utils": "^4.0.311",
+    "@remotion/cli": "4.0.314",
+    "@remotion/lambda": "4.0.314",
+    "@remotion/media-parser": "4.0.314",
+    "@remotion/media-utils": "4.0.314",
     "@sassy/validators": "workspace:*",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
-    "remotion": "^4.0.311",
+    "remotion": "4.0.314",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@remotion/tailwind-v4": "4.0.314",
     "@sassy/eslint-config": "workspace:*",
     "@sassy/prettier-config": "workspace:*",
+    "@sassy/tailwind-config": "workspace:*",
     "@sassy/tsconfig": "workspace:*",
     "@types/node": "^22.10.10",
     "@types/react": "catalog:react19",
@@ -43,6 +48,7 @@
     "dotenv-cli": "^8.0.0",
     "eslint": "catalog:",
     "prettier": "catalog:",
+    "tailwindcss": "catalog:",
     "typescript": "catalog:"
   },
   "prettier": "@sassy/prettier-config"
