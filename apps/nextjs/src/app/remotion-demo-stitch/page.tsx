@@ -369,7 +369,6 @@ const FileUploadDropzone = () => {
           <h3 className="text-lg font-semibold text-green-800">
             Video Uploaded Successfully!
           </h3>
-          
           <div className="space-y-4">
             <div className="space-y-4">
               <div className="flex justify-between items-center">
@@ -380,6 +379,17 @@ const FileUploadDropzone = () => {
                   Add Clip
                 </Button>
               </div>
+              <Button
+                onClick={() => setClips([
+                  { range: "00:00-00:05", caption: "First demo snippet" },
+                  { range: "00:10-00:15", caption: "Second demo snippet" },
+                  { range: "00:20-00:25", caption: "Third demo snippet" },
+                ])}
+                variant="secondary"
+                className="w-full mb-2"
+              >
+                Load Demo Clips
+              </Button>
               
               {clips.map((clip, index) => (
                 <div key={index} className="space-y-2 p-3 border rounded">
@@ -404,7 +414,7 @@ const FileUploadDropzone = () => {
                         value={clip.range}
                         onChange={(e) => updateClip(index, "range", e.target.value)}
                         placeholder="01:30-02:00"
-                        className="w-full p-2 text-sm border rounded focus:outline-hidden focus:ring-2 focus:ring-green-500"
+                        className="w-full p-2 text-sm border rounded focus:outline-hidden focus:ring-2 focus:ring-green-500 text-gray-900"
                       />
                     </div>
                     
@@ -416,7 +426,7 @@ const FileUploadDropzone = () => {
                         onChange={(e) => updateClip(index, "caption", e.target.value)}
                         placeholder="Enter caption..."
                         maxLength={200}
-                        className="w-full p-2 text-sm border rounded focus:outline-hidden focus:ring-2 focus:ring-green-500"
+                        className="w-full p-2 text-sm border rounded focus:outline-hidden focus:ring-2 focus:ring-green-500 text-gray-900"
                       />
                     </div>
                   </div>
