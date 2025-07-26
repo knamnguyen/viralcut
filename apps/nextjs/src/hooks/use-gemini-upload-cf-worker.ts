@@ -10,7 +10,7 @@ function upload(
 ) {
   const xhr = new XMLHttpRequest();
 
-  return new Promise<unknown>((resolve, reject) => {
+  return new Promise<{ fileUri: string }>((resolve, reject) => {
     const { onProgress } = opts ?? {};
 
     if (onProgress) {
@@ -26,7 +26,16 @@ function upload(
     // Handle completion
     xhr.addEventListener("load", () => {
       if (xhr.status >= 200 && xhr.status < 300) {
-        resolve(xhr.response);
+        try {
+          const json = JSON.parse(xhr.responseText) as { fileUri?: string };
+          if (json.fileUri) {
+            resolve({ fileUri: json.fileUri });
+          } else {
+            reject(new Error("No file URI returned from upload"));
+          }
+        } catch {
+          return reject(new Error("Failed to parse response"));
+        }
       } else {
         reject(new Error(`Upload failed: ${xhr.status}`));
       }
@@ -40,7 +49,6 @@ function upload(
     // Start upload
     xhr.open("PUT", url);
     xhr.setRequestHeader("Content-Length", file.size.toString());
-    xhr.setRequestHeader("Content-Type", file.type);
     xhr.setRequestHeader("X-Goog-Upload-Offset", "0");
     xhr.setRequestHeader("X-Goog-Upload-Command", "upload, finalize");
     xhr.send(file);
