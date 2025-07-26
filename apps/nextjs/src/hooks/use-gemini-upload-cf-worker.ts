@@ -38,7 +38,11 @@ function upload(
     });
 
     // Start upload
-    xhr.open("POST", url);
+    xhr.open("PUT", url);
+    xhr.setRequestHeader("Content-Length", file.size.toString());
+    xhr.setRequestHeader("Content-Type", file.type);
+    xhr.setRequestHeader("X-Goog-Upload-Offset", "0");
+    xhr.setRequestHeader("X-Goog-Upload-Command", "upload, finalize");
     xhr.send(file);
   });
 }
