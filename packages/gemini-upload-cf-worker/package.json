@@ -1,0 +1,33 @@
+{
+  "name": "@sassy/gemini-upload-cf-worker",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "wrangler dev",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "cf-typegen": "wrangler types"
+  },
+  "devDependencies": {
+    "@sassy/eslint-config": "workspace:*",
+    "@sassy/prettier-config": "workspace:*",
+    "@sassy/tsconfig": "workspace:*",
+    "@types/bun": "^1.2.19",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  },
+  "prettier": "@sassy/prettier-config",
+  "dependencies": {
+    "bun": "^1.2.19",
+    "wrangler": "^4.26.0"
+  }
+}
